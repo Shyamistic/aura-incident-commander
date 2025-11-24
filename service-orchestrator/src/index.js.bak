@@ -1,0 +1,88 @@
+// service-orchestrator/src/index.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { handleGoal } = require('./orchestrator');
+
+const app = express();
+
+app.use(cors());
+app.use(bodyParser.json());
+
+// ---------------------------------------------------------------------------
+// IN-MEMORY EVENT BUS
+// ---------------------------------------------------------------------------
+const EVENTS_MAX = 500;
+const events = [];
+
+function pushEvent(ev) {
+  const entry = { ts: new Date().toISOString(), ...ev };
+  events.push(entry);
+  while (events.length > EVENTS_MAX) events.shift();
+  console.log('[EVENT]', entry);
+}
+
+// Events endpoint
+app.get('/events', (req, res) => {
+  return res.json(events);
+});
+
+// ---------------------------------------------------------------------------
+// GOAL ENDPOINT
+// ---------------------------------------------------------------------------
+app.post('/goal', async (req, res) => {
+  try {
+    const { goal } = req.body;
+    if (!goal) return res.status(400).json({ error: 'goal required' });
+
+    pushEvent({ source: 'Orchestrator', type: 'goal.received', detail: goal });
+
+    const result = await handleGoal(goal, { pushEvent });
+
+    return res.json({ status: 'ok', tasks: result.tasks || result });
+  } catch (err) {
+    console.error('Error in /goal:', err);
+    pushEvent({ source: 'Orchestrator', type: 'error', detail: String(err) });
+    return res.status(500).json({ error: String(err) });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// SNS ENDPOINT (FOR LATER / LOCALSTACK / REAL AWS)
+// ---------------------------------------------------------------------------
+app.post('/sns', async (req, res) => {
+  try {
+    const msg = req.body;
+    const { handleAlarm } = require('./handlers/monitorAgent');
+    handleAlarm(msg, { pushEvent }).catch(console.error);
+    return res.sendStatus(200);
+  } catch (err) {
+    console.error('Error in /sns:', err);
+    return res.status(500).send('error');
+  }
+});
+
+// ---------------------------------------------------------------------------
+// SIMULATE FAILURE LOCALLY
+// ---------------------------------------------------------------------------
+app.post('/simulate', async (req, res) => {
+  try {
+    pushEvent({ source: 'Simulator', type: 'simulate.triggered', detail: 'Fake CloudWatch Alarm' });
+
+    const { handleAlarm } = require('./handlers/monitorAgent');
+    const fake = { Type: 'Notification', Message: JSON.stringify({ AlarmName: 'AppErrorAlarm', NewState: 'ALARM' }) };
+    handleAlarm(fake, { pushEvent }).catch(console.error);
+
+    return res.json({ simulated: true });
+  } catch (err) {
+    console.error('Error in /simulate:', err);
+    return res.status(500).json({ error: String(err) });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// SERVER START
+// ---------------------------------------------------------------------------
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log('Orchestrator listening on', PORT));

@@ -1,0 +1,208 @@
+{
+ "Resources": {
+  "IncidentTopicC2D68739": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "Autonomous Incident Commander Alarm Topic"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AutonomousIncidentCommanderStack/IncidentTopic/Resource"
+   }
+  },
+  "MonitoredFunctionServiceRoleAEBDC4FB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AutonomousIncidentCommanderStack/MonitoredFunction/ServiceRole/Resource"
+   }
+  },
+  "MonitoredFunction1721588C": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "exports.handler = async (event) => { console.log(\"Success\"); return { statusCode: 200 }; };"
+    },
+    "Environment": {
+     "Variables": {
+      "LAST_RESTART_TIME": "2025-11-16T14:33:24.827Z"
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "MonitoredFunctionServiceRoleAEBDC4FB",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x",
+    "Timeout": 3
+   },
+   "DependsOn": [
+    "MonitoredFunctionServiceRoleAEBDC4FB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AutonomousIncidentCommanderStack/MonitoredFunction/Resource"
+   }
+  },
+  "HighErrorAlarm02FF04AD": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "IncidentTopicC2D68739"
+     }
+    ],
+    "AlarmDescription": "Alarm for MonitoredFunction errors > 0",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 1,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "MonitoredFunction1721588C"
+      }
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "Errors",
+    "Namespace": "AWS/Lambda",
+    "OKActions": [
+     {
+      "Ref": "IncidentTopicC2D68739"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Sum",
+    "Threshold": 0,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AutonomousIncidentCommanderStack/HighErrorAlarm/Resource"
+   }
+  },
+  "HighTimeoutAlarm1BAE2C3C": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "IncidentTopicC2D68739"
+     }
+    ],
+    "AlarmDescription": "Alarm for MonitoredFunction timeouts > 0",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 1,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "MonitoredFunction1721588C"
+      }
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "Throttles",
+    "Namespace": "AWS/Lambda",
+    "OKActions": [
+     {
+      "Ref": "IncidentTopicC2D68739"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Sum",
+    "Threshold": 0,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AutonomousIncidentCommanderStack/HighTimeoutAlarm/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zXJywrCMBCF4WfpfjrW4AuI4Fao7mWaRJw2l5KLXYS8u6Ti6nycX6AQJxw62mIv1dIbnrDcE8kFaIvPEl3E8vArS7i83I4KhuykCMs1O5nYu5b+rsBksYze6Ha3rSCNz2qjJN9YzoaCbWlHrY23nNacYNTR5yB1BeeVxjkePkKgOOLQzZG5D9klthrH334B6gEZW7wAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "AutonomousIncidentCommanderStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "IncidentTopicArnOutput": {
+   "Value": {
+    "Ref": "IncidentTopicC2D68739"
+   },
+   "Export": {
+    "Name": "IncidentCommanderTopicArn"
+   }
+  },
+  "MonitoredFunctionNameOutput": {
+   "Value": {
+    "Ref": "MonitoredFunction1721588C"
+   },
+   "Export": {
+    "Name": "IncidentCommanderFunctionName"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

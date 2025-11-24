@@ -1,0 +1,7 @@
+# .gitignore
+node_modules/
+.env
+.DS_Store
+cdk-output.json
+dist/
+coverage/

@@ -1,0 +1,132 @@
+<!-- index.html -->
+<!-- Autonomous AWS Incident Commander: HTML/JS/CSS SPA Demo -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AURA - Autonomous AWS Incident Commander</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Mission Control Header -->
+  <header class="header card">
+    <span id="global-status-indicator" aria-label="Global Status"></span>
+    <h1 class="header-title">Autonomous Incident Commander</h1>
+    <p class="header-subtitle">/ AURA: AI-Powered Cloud Orchestration /</p>
+    <small id="demo-mode-indicator"></small>
+  </header>
+
+  <!-- Controls: Set mission goal, start deploy, simulate failures, demo toggle -->
+  <section class="controls card">
+    <textarea id="goal-input" class="goal-input" rows="3" aria-label="Mission Goal" placeholder="Describe your deployment goal...">Deploy, Monitor, and Autonomously Heal a demo application</textarea>
+    <div class="button-group">
+      <button id="btn-deploy" aria-label="Deploy" aria-pressed="false">🚀 Deploy</button>
+      <button id="btn-simulate" class="danger" aria-label="Simulate Failure" aria-pressed="false">🔥 Simulate Failure</button>
+      <button id="btn-demo" class="secondary" aria-label="Toggle Demo Mode" aria-pressed="false"></button>
+    </div>
+  </section>
+
+  <!-- Main Grid: Timeline, Cloud Map, Sidebar RCA, Agent Graph -->
+  <main class="dashboard-layout">
+    <div class="grid-main card">
+      <h3>Mission Timeline</h3>
+      <div id="mission-timeline" class="timeline" aria-live="polite"></div>
+    </div>
+    <div class="grid-main card">
+      <h3>Cloud Map</h3>
+      <div class="cloud-map-nodes">
+        <div id="cloud-map-lambda" class="cloud-node lambda" tabindex="0">Lambda</div>
+        <div id="cloud-map-watch" class="cloud-node watch" tabindex="0">CloudWatch</div>
+        <div id="cloud-map-sns" class="cloud-node sns" tabindex="0">SNS</div>
+        <div id="cloud-map-brain" class="cloud-node brain" tabindex="0">AI Brain</div>
+      </div>
+      <svg id="cloud-connectors" width="100%" height="50"></svg>
+    </div>
+    <aside class="grid-sidebar card" aria-live="polite">
+      <h3>AI Analysis (RCA)</h3>
+      <div class="incident-summary">
+        <div>
+          <div class="incident-summary-label">Root Cause Analysis</div>
+          <div id="rca-analysis" class="incident-summary-content placeholder" tabindex="0">Awaiting incident...</div>
+        </div>
+        <div>
+          <div class="incident-summary-label">Remediation Plan</div>
+          <div id="rca-plan" class="incident-summary-content placeholder" tabindex="0">—</div>
+        </div>
+        <div class="incident-summary-grid">
+          <div>
+            <div class="incident-summary-label">Detected</div>
+            <div id="rca-time-detected">—</div>
+          </div>
+          <div>
+            <div class="incident-summary-label">Remediated</div>
+            <div id="rca-time-healed">—</div>
+          </div>
+        </div>
+        <a id="rca-download-btn" href="#" download="AURA-Incident-Report.pdf" style="display:none">
+          <button class="secondary">Download Incident Report</button>
+        </a>
+      </div>
+    </aside>
+    <div class="grid-logs card" role="status" aria-live="polite">
+      <h3>Live Logs</h3>
+      <div id="live-logs-container" class="live-logs-container"></div>
+    </div>
+    <div class="grid-agentgraph card">
+      <h3>Agent Graph</h3>
+      <div class="agent-graph-wrapper">
+        <svg width="100%" height="280" viewBox="0 0 800 280" class="agent-graph-svg" aria-hidden="true">
+          <g>
+            <circle id="agent-graph-Orchestrator" class="agent-node-circle" cx="150" cy="140" r="55" />
+            <text class="agent-node-text" x="150" y="145">Orchestrator</text>
+          </g>
+          <g>
+            <circle id="agent-graph-DeployAgent" class="agent-node-circle" cx="350" cy="80" r="45" />
+            <text class="agent-node-text" x="350" y="85">DeployAgent</text>
+          </g>
+          <g>
+            <circle id="agent-graph-MonitorAgent" class="agent-node-circle" cx="550" cy="80" r="45" />
+            <text class="agent-node-text" x="550" y="85">MonitorAgent</text>
+          </g>
+          <g>
+            <circle id="agent-graph-ReasoningAgent" class="agent-node-circle" cx="650" cy="200" r="40" />
+            <text class="agent-node-text" x="650" y="205">AI Brain</text>
+          </g>
+          <g>
+            <circle id="agent-graph-HealAgent" class="agent-node-circle" cx="450" cy="200" r="40" />
+            <text class="agent-node-text" x="450" y="205">HealAgent</text>
+          </g>
+          <line class="agent-node-line" x1="205" y1="140" x2="305" y2="80" />
+          <line class="agent-node-line" x1="395" y1="80" x2="505" y2="80" />
+          <line class="agent-node-line" x1="570" y1="125" x2="630" y2="190" />
+          <line class="agent-node-line" x1="610" y1="200" x2="490" y2="200" />
+        </svg>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Footer Status -->
+  <footer class="footer card">
+    <div id="footer-status">System Ready. All agents online.</div>
+  </footer>
+  
+  <!-- Dev-only Events Playground (hidden by default) -->
+  <div id="events-playground" class="card" style="display:none">
+    <h3>Events Playground (Dev Tools)</h3>
+    <button onclick="window.injectEvent('deploy.completed')">Inject Deploy Complete</button>
+    <button onclick="window.injectEvent('alarm.received')">Inject Alarm Received</button>
+    <button onclick="window.injectEvent('reasoning.completed')">Inject Reasoning Complete</button>
+    <button onclick="window.injectEvent('heal.completed')">Inject Heal Complete</button>
+    <button onclick="window.__EVENTS__ = [];">Clear Events</button>
+    <textarea id="event-custom" rows="2" placeholder="Custom event JSON"></textarea>
+    <button onclick="window.injectCustomEvent()">Inject Custom</button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

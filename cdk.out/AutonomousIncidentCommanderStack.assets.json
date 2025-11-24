@@ -1,0 +1,21 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "cd2138e0c53c340805b422f49a964d9a98e8f0c367b353fa7bba714c03452576": {
+      "displayName": "AutonomousIncidentCommanderStack Template",
+      "source": {
+        "path": "AutonomousIncidentCommanderStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "275688773412-us-east-1-a3cf67dc": {
+          "bucketName": "cdk-hnb659fds-assets-275688773412-us-east-1",
+          "objectKey": "cd2138e0c53c340805b422f49a964d9a98e8f0c367b353fa7bba714c03452576.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::275688773412:role/cdk-hnb659fds-file-publishing-role-275688773412-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

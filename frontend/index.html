@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA - Autonomous Incident Response</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d9ff;
+            --secondary: #ff006e;
+            --accent-1: #ffd60a;
+            --accent-2: #06ffa5;
+            --accent-3: #ff3b00;
+            --bg-dark: #0a0a14;
+            --bg-darker: #050508;
+            --card-bg: #151520;
+            --card-alt: #1a1a28;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --text-muted: #707090;
+            --glow-cyan: rgba(0, 217, 255, 0.3);
+            --glow-pink: rgba(255, 0, 110, 0.3);
+            --glow-green: rgba(6, 255, 165, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.8);
+            --shadow-xl: 0 40px 80px rgba(0, 0, 0, 0.9);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 50%, #1a0a2e 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(6, 255, 165, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .page-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(21, 21, 32, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--border-color);
+            border-image: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary)) 1;
+            margin-bottom: 40px;
+            border-radius: 0 0 20px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 30px var(--glow-cyan);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--glow-cyan), 0 0 60px rgba(0, 217, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 50px var(--glow-cyan), 0 0 100px rgba(0, 217, 255, 0.4);
+            }
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-main {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .status-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-badge {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.online {
+            border-color: var(--accent-2);
+            color: var(--accent-2);
+            background: rgba(6, 255, 165, 0.1);
+            box-shadow: 0 0 20px rgba(6, 255, 165, 0.3);
+        }
+
+        .status-badge.offline {
+            border-color: var(--accent-3);
+            color: var(--accent-3);
+            background: rgba(255, 59, 0, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .version-badge {
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid var(--accent-1);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--accent-1);
+            font-weight: 600;
+        }
+
+        /* MAIN CONTAINER */
+        .main-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1400px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+
+        /* CARD SYSTEM */
+        .card {
+            background: linear-gradient(135deg, rgba(21, 21, 32, 0.9) 0%, rgba(26, 26, 40, 0.8) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 40px var(--glow-cyan), var(--shadow-xl);
+            transform: translateY(-8px);
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--glow-cyan);
+        }
+
+        /* SECTION: CONTROL PANEL */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: 2px solid;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: currentColor;
+            opacity: 0.1;
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 30px var(--glow-cyan), inset 0 0 20px rgba(0, 217, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 0 30px var(--glow-pink), inset 0 0 20px rgba(255, 0, 110, 0.1);
+            transform: scale(1.05);
+        }
+
+        .btn-success {
+            border-color: var(--accent-2);
+            color: var(--accent-2);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 0 30px var(--glow-green), inset 0 0 20px rgba(6, 255, 165, 0.1);
+            transform: scale(1.05);
+        }
+
+        .btn-warning {
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5), inset 0 0 20px rgba(255, 214, 10, 0.1);
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* STATS */
+        .stats-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .stat-item {
+            margin-bottom: 28px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* AGENT VISUALIZATION */
+        .agent-network {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(255, 0, 110, 0.05) 100%);
+            border-radius: 16px;
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            position: relative;
+            border: 2px solid rgba(0, 217, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .agent-network::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 50%, rgba(255, 0, 110, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .agent-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .agent-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .agent-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.05));
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .agent-node.active .agent-icon {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.3), rgba(0, 217, 255, 0.1));
+            box-shadow: 0 0 50px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.2);
+            transform: scale(1.15);
+            animation: agent-pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes agent-pulse {
+            0%, 100% {
+                box-shadow: 0 0 50px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 70px rgba(0, 217, 255, 0.8), inset 0 0 30px rgba(0, 217, 255, 0.3);
+            }
+        }
+
+        .agent-name {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            min-width: 80px;
+            color: var(--text-primary);
+        }
+
+        .agent-status {
+            font-size: 11px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(112, 112, 144, 0.2);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .agent-node.active .agent-status {
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(0, 217, 255, 0.4);
+        }
+
+        .agent-connection {
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            position: relative;
+            min-width: 40px;
+        }
+
+        .agent-connection.active {
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+            animation: flow 1s ease-in-out infinite;
+        }
+
+        @keyframes flow {
+            0% {
+                background-position: 0% center;
+            }
+            100% {
+                background-position: 100% center;
+            }
+        }
+
+        /* EVENT LOG */
+        .event-log {
+            height: 420px;
+            overflow-y: auto;
+            background: linear-gradient(135deg, rgba(5, 5, 8, 0.8) 0%, rgba(10, 10, 20, 0.6) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .event-log::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .event-item {
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            animation: slideInLeft 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .event-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .event-item.alarm {
+            border-left-color: var(--secondary);
+            background: rgba(255, 0, 110, 0.08);
+        }
+
+        .event-item.analysis {
+            border-left-color: var(--primary);
+            background: rgba(0, 217, 255, 0.08);
+        }
+
+        .event-item.healing {
+            border-left-color: var(--accent-2);
+            background: rgba(6, 255, 165, 0.08);
+        }
+
+        .event-item.error {
+            border-left-color: var(--accent-3);
+            background: rgba(255, 59, 0, 0.08);
+        }
+
+        .event-ts {
+            color: var(--accent-1);
+            font-weight: 600;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        .event-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .event-source {
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .event-type {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .event-detail {
+            color: var(--text-primary);
+            margin-top: 6px;
+            word-break: break-word;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--accent-2), var(--primary));
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease-out;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(21, 21, 32, 0.95) 0%, rgba(26, 26, 40, 0.95) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 60px var(--glow-cyan), var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .modal-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        .modal-input-group {
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .modal-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(5, 5, 8, 0.9);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3), inset 0 0 12px rgba(0, 217, 255, 0.1);
+            background: rgba(5, 5, 8, 0.95);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .modal-buttons .btn {
+            flex: 1;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        /* NOTIFICATIONS */
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 2px solid;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 999;
+            animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.success {
+            background: rgba(6, 255, 165, 0.1);
+            border-color: var(--accent-2);
+            color: var(--accent-2);
+            box-shadow: 0 0 30px var(--glow-green), var(--shadow-lg);
+        }
+
+        .notification.error {
+            background: rgba(255, 59, 0, 0.1);
+            border-color: var(--accent-3);
+            color: var(--accent-3);
+            box-shadow: 0 0 30px rgba(255, 59, 0, 0.4), var(--shadow-lg);
+        }
+
+        .notification.info {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 30px var(--glow-cyan), var(--shadow-lg);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 12px;
+            }
+
+            .navbar {
+                padding: 12px 16px;
+                margin-bottom: 20px;
+                border-radius: 0 0 12px 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .agent-network {
+                min-height: 240px;
+                padding: 16px 12px;
+            }
+
+            .agent-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 28px;
+            }
+
+            .agent-name {
+                font-size: 11px;
+                min-width: 64px;
+            }
+
+            .event-log {
+                height: 300px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .notification {
+                bottom: 12px;
+                right: 12px;
+                padding: 12px 16px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="logo-section">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">
+                    <div class="logo-main">AURA</div>
+                    <div class="logo-sub">Autonomous Response</div>
+                </div>
+            </div>
+            <div class="status-section">
+                <div class="status-badge online" id="statusBadge">
+                    <div class="status-dot"></div>
+                    Online
+                </div>
+                <div class="version-badge">v2.0 Enterprise</div>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTAINER -->
+        <div class="main-container">
+            <!-- LEFT PANEL: CONTROLS & STATS -->
+            <div class="card">
+                <div class="card-title">⚙️ Control Panel</div>
+                <div class="control-panel">
+                    <button class="btn btn-primary" onclick="deployInfra()">🚀 Deploy Infrastructure</button>
+                    <button class="btn btn-danger" onclick="simulateIncident()">🔴 Simulate Incident</button>
+                    <button class="btn btn-success" onclick="downloadReport()">📄 Download Report</button>
+                    <button class="btn btn-warning" onclick="resetSystem()">🔄 Reset System</button>
+                </div>
+
+                <div class="stats-section">
+                    <div class="card-title">📊 Metrics</div>
+                    <div class="stat-item">
+                        <div class="stat-label">Total Incidents</div>
+                        <div class="stat-value" id="totalIncidents">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Resolved</div>
+                        <div class="stat-value" id="resolvedCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">MTTR (Mean Time)</div>
+                        <div class="stat-value" id="avgResolution">~2.5s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">System Health</div>
+                        <div class="stat-value" id="systemHealth">100%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER PANEL: AGENT NETWORK & EVENTS -->
+            <div>
+                <div class="card">
+                    <div class="card-title">🤖 Agent Network Architecture</div>
+                    <div class="agent-network">
+                        <div class="agent-container">
+                            <div class="agent-node" id="monitorNode">
+                                <div class="agent-icon">👁️</div>
+                                <div class="agent-name">Monitor</div>
+                                <div class="agent-status">Standby</div>
+                            </div>
+                        </div>
+
+                        <div class="agent-connection" id="conn1"></div>
+
+                        <div class="agent-container">
+                            <div class="agent-node" id="reasonNode">
+                                <div class="agent-icon">🧠</div>
+                                <div class="agent-name">Reasoning</div>
+                                <div class="agent-status">Idle</div>
+                            </div>
+                        </div>
+
+                        <div class="agent-connection" id="conn2"></div>
+
+                        <div class="agent-container">
+                            <div class="agent-node" id="healNode">
+                                <div class="agent-icon">⚕️</div>
+                                <div class="agent-name">Heal</div>
+                                <div class="agent-status">Ready</div>
+                            </div>
+                        </div>
+
+                        <div class="agent-connection" id="conn3"></div>
+
+                        <div class="agent-container">
+                            <div class="agent-node" id="reportNode">
+                                <div class="agent-icon">📄</div>
+                                <div class="agent-name">Report</div>
+                                <div class="agent-status">Online</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-title">📡 Live Event Stream</div>
+                    <div class="event-log" id="eventLog">
+                        <div class="event-item analysis">
+                            <div class="event-ts">[SYSTEM]</div>
+                            <div class="event-header">
+                                <span class="event-source">Orchestrator</span>
+                            </div>
+                            <div class="event-detail">✓ System initialized and ready for incidents</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: RISK & INFO -->
+            <div>
+                <div class="card">
+                    <div class="card-title">⚡ AI Risk Prediction</div>
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Risk Score (0-100)</div>
+                            <div style="font-size: 48px; font-weight: 700; background: linear-gradient(90deg, var(--primary), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="riskScore">0</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Prediction</div>
+                            <div style="font-size: 13px; color: var(--accent-2); font-weight: 600;" id="prediction">🟢 System stable</div>
+                        </div>
+                        <div style="padding: 12px; background: rgba(0, 217, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px;">
+                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">How It Works</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.6;">
+                              AURA's AI analyzes error patterns, incident frequency, and healing success rates to predict future incidents before they happen.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-title">ℹ️ System Info</div>
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Backend Status</div>
+                            <div style="font-size: 14px; color: var(--accent-2);">🟢 Connected</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">AWS Integration</div>
+                            <div style="font-size: 14px; color: var(--accent-2);">✓ Configured</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">AI Engine</div>
+                            <div style="font-size: 14px; color: var(--primary);">Amazon Q Ready</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Uptime</div>
+                            <div style="font-size: 14px; color: var(--accent-2);">24/7 Monitoring</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            🎬 AURA v2.0 - Enterprise Autonomous Incident Response | Powered by AWS & Amazon Q | © 2025
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🚀 Deploy Infrastructure</div>
+            <div class="modal-description">
+                Specify your deployment goal. The system will autonomously execute your infrastructure deployment with real-time monitoring and automated remediation.
+            </div>
+            <div class="modal-input-group">
+                <label class="modal-label">Deployment Goal</label>
+                <input type="text" class="modal-input" id="goalInput" placeholder="e.g., Deploy AWS Lambda Stack with CloudWatch monitoring" value="Deploy AWS Lambda Stack with CloudWatch monitoring">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="confirmDeploy()">🚀 Execute Deployment</button>
+                <button class="btn btn-warning" style="border-color: var(--accent-1); color: var(--accent-1);" onclick="closeModal()">✕ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND = 'http://localhost:3000';
+        let eventCount = 0;
+
+        // Initialize
+        window.addEventListener('load', () => {
+            checkHealth();
+            pollEvents();
+            setInterval(pollEvents, 500);
+            setInterval(checkHealth, 5000);
+            setInterval(fetchRiskScore, 2000);
+        });
+
+        // Health check
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${BACKEND}/health`);
+                if (res.ok) {
+                    document.getElementById('statusBadge').innerHTML = '<div class="status-dot"></div>Online';
+                    document.getElementById('statusBadge').className = 'status-badge online';
+                }
+            } catch {
+                document.getElementById('statusBadge').innerHTML = '<div class="status-dot"></div>Offline';
+                document.getElementById('statusBadge').className = 'status-badge offline';
+            }
+        }
+
+        // Fetch Risk Score
+        async function fetchRiskScore() {
+            try {
+                const res = await fetch(`${BACKEND}/risk-score`);
+                const data = await res.json();
+                
+                const riskElement = document.getElementById('riskScore');
+                if (riskElement) {
+                    riskElement.textContent = data.riskScore;
+                    
+                    if (data.riskScore > 70) {
+                        riskElement.style.color = '#ff3b00';
+                    } else if (data.riskScore > 50) {
+                        riskElement.style.color = '#ffd60a';
+                    } else {
+                        riskElement.style.color = '#06ffa5';
+                    }
+                }
+                
+                const predictionElement = document.getElementById('prediction');
+                if (predictionElement) {
+                    predictionElement.textContent = data.prediction;
+                    if (data.riskScore > 70) {
+                        predictionElement.style.color = '#ff3b00';
+                    } else if (data.riskScore > 50) {
+                        predictionElement.style.color = '#ffd60a';
+                    } else {
+                        predictionElement.style.color = '#06ffa5';
+                    }
+                }
+            } catch (e) {
+                console.error('Risk score fetch error:', e);
+            }
+        }
+
+        // Poll events
+        async function pollEvents() {
+            try {
+                const res = await fetch(`${BACKEND}/events`);
+                const events = await res.json();
+                displayEvents(events);
+                updateAgents(events);
+            } catch (e) {
+                console.error('Poll error:', e);
+            }
+        }
+
+        // Display events
+        function displayEvents(events) {
+            const log = document.getElementById('eventLog');
+            const newEvents = events.slice(Math.max(0, eventCount));
+
+            newEvents.forEach(evt => {
+                const div = document.createElement('div');
+                div.className = 'event-item';
+
+                if (evt.type.includes('alarm') || evt.type.includes('triggered')) div.classList.add('alarm');
+                else if (evt.type.includes('analysis')) div.classList.add('analysis');
+                else if (evt.type.includes('heal')) div.classList.add('healing');
+                else if (evt.type.includes('error')) div.classList.add('error');
+
+                const ts = new Date(evt.ts).toLocaleTimeString();
+                div.innerHTML = `
+                    <div class="event-ts">[${ts}]</div>
+                    <div class="event-header">
+                        <span class="event-source">${evt.source}</span>
+                        <span class="event-type">${evt.type}</span>
+                    </div>
+                    <div class="event-detail">${evt.detail}</div>
+                `;
+
+                log.appendChild(div);
+            });
+
+            eventCount = events.length;
+            
+            // Force scroll to bottom
+            setTimeout(() => {
+                log.scrollTop = log.scrollHeight;
+            }, 0);
+
+            // Update stats
+            document.getElementById('totalIncidents').textContent = events.filter(e => e.source === 'Simulator').length;
+            document.getElementById('resolvedCount').textContent = events.filter(e => e.source === 'HealAgent' && e.type === 'healing.completed').length;
+        }
+
+        // Update agent states
+        function updateAgents(events) {
+            const lastEvent = events[events.length - 1];
+            if (!lastEvent) return;
+
+            const source = lastEvent.source;
+            if (source === 'MonitorAgent') activateAgent('monitorNode', 'conn1');
+            else if (source === 'ReasoningAgent') activateAgent('reasonNode', 'conn2');
+            else if (source === 'HealAgent') activateAgent('healNode', 'conn3');
+        }
+
+        function activateAgent(nodeId, connId) {
+            const node = document.getElementById(nodeId);
+            node.classList.add('active');
+            document.getElementById(connId)?.classList.add('active');
+
+            setTimeout(() => {
+                node.classList.remove('active');
+                document.getElementById(connId)?.classList.remove('active');
+            }, 2000);
+        }
+
+        // Deploy Infrastructure
+        function deployInfra() {
+            document.getElementById('modal').classList.add('show');
+        }
+
+        async function confirmDeploy() {
+            const goal = document.getElementById('goalInput').value;
+            if (!goal.trim()) return notify('Enter deployment goal', 'error');
+
+            try {
+                await fetch(`${BACKEND}/goal`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ goal })
+                });
+                closeModal();
+                notify('🚀 Deployment started successfully', 'success');
+            } catch (e) {
+                notify(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        // Simulate
+        async function simulateIncident() {
+            try {
+                await fetch(`${BACKEND}/simulate`, { method: 'POST' });
+                notify('🔴 Incident simulation triggered', 'info');
+            } catch (e) {
+                notify(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        // Download report
+        async function downloadReport() {
+            try {
+                const res = await fetch(`${BACKEND}/events`);
+                const events = await res.json();
+
+                const html = `
+                    <html>
+                    <head>
+                        <style>
+                        body { font-family: Arial; margin: 20px; background: #fff; }
+                        h1 { color: #00d9ff; border-bottom: 3px solid #00d9ff; padding-bottom: 10px; }
+                        h2 { color: #ff006e; margin-top: 30px; }
+                        .event { margin: 10px 0; padding: 12px; border-left: 4px solid #00d9ff; background: #f0f9ff; }
+                        .stat { display: inline-block; margin: 15px 30px 15px 0; }
+                        .stat-label { color: #666; font-size: 11px; text-transform: uppercase; }
+                        .stat-value { font-size: 28px; font-weight: bold; color: #00d9ff; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>🎬 AURA INCIDENT REPORT</h1>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                        
+                        <h2>System Metrics</h2>
+                        <div class="stat">
+                            <div class="stat-label">Total Events</div>
+                            <div class="stat-value">${events.length}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Incidents</div>
+                            <div class="stat-value">${events.filter(e => e.source === 'Simulator').length}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Resolved</div>
+                            <div class="stat-value">${events.filter(e => e.source === 'HealAgent' && e.type === 'healing.completed').length}</div>
+                        </div>
+                        
+                        <h2>Event Log</h2>
+                        ${events.map(e => `
+                            <div class="event">
+                                <strong>${e.source}</strong> [${e.type}] - ${new Date(e.ts).toLocaleTimeString()}<br>
+                                ${e.detail}
+                            </div>
+                        `).join('')}
+                        
+                        <hr style="margin-top: 40px; border: none; border-top: 2px solid #00d9ff;">
+                        <p style="text-align: center; color: #666; font-size: 11px; margin-top: 20px;">
+                            AURA v2.0 - Autonomous Incident Response System | AWS & Amazon Q Powered
+                        </p>
+                    </body>
+                    </html>
+                `;
+
+                const opt = {
+                    margin: 10,
+                    filename: `AURA-Report-${new Date().toISOString().split('T')[0]}.pdf`,
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+
+                html2pdf().set(opt).from(html).save();
+                notify('📄 Report downloaded successfully', 'success');
+            } catch (e) {
+                notify(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        // Reset System - FIXED VERSION
+        async function resetSystem() {
+            if (!confirm('⚠️ Reset all incidents, events, and statistics?')) return;
+            
+            try {
+                const res = await fetch(`${BACKEND}/reset`, { method: 'POST' });
+                if (res.ok) {
+                    const data = await res.json();
+                    notify('✅ System reset successfully', 'success');
+                    
+                    // Clear UI immediately
+                    document.getElementById('eventLog').innerHTML = `
+                        <div class="event-item analysis">
+                            <div class="event-ts">[SYSTEM RESET]</div>
+                            <div class="event-header">
+                                <span class="event-source">Orchestrator</span>
+                            </div>
+                            <div class="event-detail">✓ System cleared and ready for new incidents</div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('totalIncidents').textContent = '0';
+                    document.getElementById('resolvedCount').textContent = '0';
+                    document.getElementById('avgResolution').textContent = '~2.5s';
+                    document.getElementById('systemHealth').textContent = '100%';
+                    document.getElementById('riskScore').textContent = '0';
+                    document.getElementById('riskScore').style.color = '#06ffa5';
+                    document.getElementById('prediction').textContent = '🟢 System stable';
+                    document.getElementById('prediction').style.color = '#06ffa5';
+                    
+                    // Reset agent states
+                    document.querySelectorAll('.agent-node').forEach(node => {
+                        node.classList.remove('active');
+                        node.querySelector('.agent-status').textContent = 'Ready';
+                        node.querySelector('.agent-status').className = 'agent-status';
+                    });
+                    
+                    document.querySelectorAll('.agent-connection').forEach(conn => {
+                        conn.classList.remove('active');
+                    });
+                    
+                    eventCount = 0;
+                    
+                    setTimeout(() => {
+                        notify('🔄 Page refreshing...', 'info');
+                        location.reload();
+                    }, 1000);
+                }
+            } catch (e) {
+                notify(`❌ Reset failed: ${e.message}`, 'error');
+            }
+        }
+
+        // Modal control
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        window.onclick = e => {
+            if (e.target.id === 'modal') closeModal();
+        };
+
+        // Notifications
+        function notify(msg, type) {
+            const div = document.createElement('div');
+            div.className = `notification ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3500);
+        }
+    </script>
+</body>
+</html>
+

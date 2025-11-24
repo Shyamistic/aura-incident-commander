@@ -1,0 +1,8 @@
+{
+  "app": "node infra-cdk/dist/bin/app.js",
+  "context": {
+    "@aws-cdk/aws-sns-subscriptions:useSsl": true,
+    "@aws-cdk/core:stackRelativeExports": true,
+    "aws-cdk:enable- αλλά-stack-references": true
+  }
+}

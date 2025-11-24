@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["es2020"],
+    "outDir": "infra-cdk/dist",
+    "rootDir": "infra-cdk",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "infra-cdk/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "infra-cdk/dist" 
+  ]
+}

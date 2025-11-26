@@ -28,14 +28,18 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin, like curl or Postman
     if (!origin) return callback(null, true);
-    // Allow Vercel deploys (.vercel.app) and localhost for local dev
+
+    // Allow all Vercel domains and localhost for dev
     if (
-      /^https:\/\/aura-incident-commander(-[a-z0-9]+)?\.vercel\.app$/.test(origin) ||
+      origin.includes('.vercel.app') ||
       origin === 'http://localhost:3000'
     ) {
       return callback(null, true);
     }
+
+    // Everything else is blocked
     return callback(new Error('CORS policy: Not allowed by AURA backend'), false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],

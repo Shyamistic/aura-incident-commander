@@ -442,6 +442,7 @@ app.post('/deny/:incidentId', async (req, res) => {
   }
 });
 
+
 // ===== ERROR HANDLING =====
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err);
@@ -468,3 +469,11 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
+const PORT = process.env.PORT || 3000; // Use Render's port or default to 3000 locally
+
+// 0.0.0.0 is REQUIRED for Render to see your app
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Orchestrator listening on port ${PORT}`);
+  subscribeToSnsTopic();
+});

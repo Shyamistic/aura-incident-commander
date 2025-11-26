@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -1432,15 +1432,34 @@
     </div>
 
     <script>
-        const BACKEND = 'https://aura-backend-2q63.onrender.com';
-        let eventCount = 0;
-        let performanceChart = null;
-        let chartData = {
-            labels: [],
-            incidents: [],
-            healingTime: []
-        };
-        let recognition = null;
+    const BACKEND = 'https://aura-backend-2q63.onrender.com';
+    let eventCount = 0;
+    let performanceChart = null;
+    let chartData = {
+        labels: [],
+        incidents: [],
+        healingTime: []
+    };
+    let recognition = null;
+        // --- Utility for Defensive Stringification ---
+    function safeString(val) {
+        if (typeof val === "string") return val;
+        if (val == null) return "";
+        try { return JSON.stringify(val); } catch { return String(val); }
+    }
+
+    // -- Init and Polling
+    window.addEventListener('load', () => {
+        initChart();
+        checkHealth();
+        pollEvents();
+        setInterval(pollEvents, 2000);
+        setInterval(checkHealth, 5000);
+        setInterval(fetchRiskScore, 2000);
+        setInterval(updateCostEstimate, 3000);
+        initVoiceRecognition();
+    });
+
 
         // Initialize
         window.addEventListener('load', () => {
@@ -1641,130 +1660,107 @@
         }
 
         // Poll Events
-       async function pollEvents() {
-       try {
-    const res = await fetch(`${BACKEND}/events`);
-    const events = await res.json();
-    // Defensive: Only process if we got an array
-    if (!Array.isArray(events)) {
-      // Optionally, log error message from backend
-      console.warn('Backend did not return array:', events);
-      return;
+// --- Robust Event Polling ---
+    async function pollEvents() {
+        try {
+            const res = await fetch(`${BACKEND}/events`);
+            const events = await res.json();
+            if (!Array.isArray(events)) {
+                console.warn('Backend did not return array:', events);
+                return;
+            }
+            displayEvents(events);
+            updateAgents(events);
+            updateTimeline(events);
+        } catch (e) {
+            console.error('Poll error:', e);
+        }
     }
-    displayEvents(events);
-    updateAgents(events);
-    updateTimeline(events);
-  } catch (e) {
-    console.error('Poll error:', e);
-  }
-}
 
-        // Display Events
-        function displayEvents(events) {
-            const log = document.getElementById('eventLog');
-            const newEvents = events.slice(Math.max(0, eventCount));
+    // --- Robust Display of Event Log ---
+    function displayEvents(events) {
+        const log = document.getElementById('eventLog');
+        const newEvents = events.slice(Math.max(0, eventCount));
+        newEvents.forEach(evt => {
+            const div = document.createElement('div');
+            div.className = 'event-item';
+            if (evt.type.includes('alarm') || evt.type.includes('triggered')) div.classList.add('alarm');
+            else if (evt.type.includes('analysis')) div.classList.add('analysis');
+            else if (evt.type.includes('heal')) div.classList.add('healing');
+            else if (evt.type.includes('error')) div.classList.add('error');
 
-            newEvents.forEach(evt => {
-                const div = document.createElement('div');
-                div.className = 'event-item';
+            const ts = new Date(evt.ts).toLocaleTimeString();
+            let detailHtml = safeString(evt.detail);
 
-                if (evt.type.includes('alarm') || evt.type.includes('triggered')) div.classList.add('alarm');
-                else if (evt.type.includes('analysis')) div.classList.add('analysis');
-                else if (evt.type.includes('heal')) div.classList.add('healing');
-                else if (evt.type.includes('error')) div.classList.add('error');
-
-                const ts = new Date(evt.ts).toLocaleTimeString();
-                let detailHtml = typeof evt.detail === "string" ? evt.detail : JSON.stringify(evt.detail || "");
-                
-
-                // PII Redaction
+            // PII Redaction (if string)
+            if (typeof detailHtml.replace === "function") {
                 detailHtml = detailHtml.replace(/\b[\w\.-]+@[\w\.-]+\.\w+\b/g, '<span class="redacted" title="Email Redacted">[REDACTED_EMAIL]</span>');
                 detailHtml = detailHtml.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '<span class="redacted" title="SSN Redacted">[REDACTED_SSN]</span>');
-
-                // AI Decision Card
-                let aiCardHtml = '';
-                if (evt.source === 'ReasoningAgent' || evt.source.includes('Amazon')) {
-                    aiCardHtml = `
-                        <div class="ai-card">
-                            <div class="ai-header">🧠 AI DECISION ENGINE</div>
-                            <div style="font-size: 10px; color: #a0a0c0; margin-bottom: 6px;">Root Cause: ${evt.detail}</div>
-                            <div>
-                                <span class="ai-tag tag-policy">📜 SOP-AWS-001</span>
-                                <span class="ai-tag tag-cost">💰 $0.${Math.floor(Math.random()*99)}</span>
-                                <span class="ai-tag tag-compliance">🛡️ SOC2-Compliant</span>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                div.innerHTML = `
-                    <div class="event-ts">[${ts}]</div>
-                    <div class="event-header">
-                        <span class="event-source">${evt.source}</span>
-                        <span class="event-type">${evt.type}</span>
-                    </div>
-                    <div class="event-detail">${detailHtml}</div>
-                    ${aiCardHtml}
-                `;
-
-                log.appendChild(div);
-            });
-
-            eventCount = events.length;
-            
-            setTimeout(() => {
-                log.scrollTop = log.scrollHeight;
-            }, 0);
-
-            // Update metrics
-            const incidents = events.filter(e => e.source === 'Simulator').length;
-            const resolved = events.filter(e => e.source === 'HealAgent' && e.type === 'healing.completed').length;
-            
-            document.getElementById('totalIncidents').textContent = incidents;
-            document.getElementById('resolvedCount').textContent = resolved;
-
-            if (incidents > 0) {
-                const health = Math.max(0, 100 - (incidents * 10));
-                document.getElementById('systemHealth').textContent = health + '%';
             }
 
-            updateChart();
+            // AI Decision Card
+            let aiCardHtml = '';
+            if (evt.source === 'ReasoningAgent' || (evt.source && evt.source.includes('Amazon'))) {
+                aiCardHtml = `
+                    <div class="ai-card">
+                        <div class="ai-header">🧠 AI DECISION ENGINE</div>
+                        <div style="font-size: 10px; color: #a0a0c0; margin-bottom: 6px;">Root Cause: ${safeString(evt.detail)}</div>
+                        <div>
+                            <span class="ai-tag tag-policy">📜 SOP-AWS-001</span>
+                            <span class="ai-tag tag-cost">💰 $0.${Math.floor(Math.random()*99)}</span>
+                            <span class="ai-tag tag-compliance">🛡️ SOC2-Compliant</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            div.innerHTML = `
+                <div class="event-ts">[${ts}]</div>
+                <div class="event-header">
+                    <span class="event-source">${evt.source}</span>
+                    <span class="event-type">${evt.type}</span>
+                </div>
+                <div class="event-detail">${detailHtml}</div>
+                ${aiCardHtml}
+            `;
+            log.appendChild(div);
+        });
+        eventCount = events.length;
+        setTimeout(() => {
+            log.scrollTop = log.scrollHeight;
+        }, 0);
+
+        // Update metrics
+        const incidents = events.filter(e => e.source === 'Simulator').length;
+        const resolved = events.filter(e => e.source === 'HealAgent' && e.type === 'healing.completed').length;
+        
+        document.getElementById('totalIncidents').textContent = incidents;
+        document.getElementById('resolvedCount').textContent = resolved;
+
+        if (incidents > 0) {
+            const health = Math.max(0, 100 - (incidents * 10));
+            document.getElementById('systemHealth').textContent = health + '%';
         }
+        updateChart();
+    }
 
-        // Update Agents
-        function updateAgents(events) {
-            const lastEvent = events[events.length - 1];
-            if (!lastEvent) return;
+    // --- Robust Timeline ---
+    function updateTimeline(events) {
+        const timeline = document.getElementById('timeline');
+        if (!Array.isArray(events)) return;
+        const recentEvents = events.slice(-5);
 
-            const source = lastEvent.source;
-            if (source === 'MonitorAgent') activateAgent('monitorNode', 'conn1');
-            else if (source === 'ReasoningAgent') activateAgent('reasonNode', 'conn2');
-            else if (source === 'HealAgent') activateAgent('healNode', 'conn3');
-        }
-
-        function activateAgent(nodeId, connId) {
-            const node = document.getElementById(nodeId);
-            node.classList.add('active');
-            document.getElementById(connId)?.classList.add('active');
-
-            setTimeout(() => {
-                node.classList.remove('active');
-                document.getElementById(connId)?.classList.remove('active');
-            }, 2000);
-        }
-
-        // Update Timeline
-        function updateTimeline(events) {
-            const timeline = document.getElementById('timeline');
-            const recentEvents = events.slice(-5);
-
-            timeline.innerHTML = recentEvents.map(evt => `
+        timeline.innerHTML = recentEvents.map(evt => {
+            let desc = safeString(evt.detail);
+            if (desc.length > 60) desc = desc.substring(0, 60) + "...";
+            return `
                 <div class="timeline-item">
                     <div class="timeline-time">${new Date(evt.ts).toLocaleTimeString()}</div>
-                    <div class="timeline-desc">${evt.source}: ${evt.detail.substring(0, 60)}...</div>
+                    <div class="timeline-desc">${desc}</div>
                 </div>
-            `).join('');
-        }
+            `;
+        }).join('');
+    }
 
         // Deploy Infrastructure
         function deployInfra() {

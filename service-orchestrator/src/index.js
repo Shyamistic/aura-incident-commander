@@ -28,18 +28,16 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin, like curl or Postman
     if (!origin) return callback(null, true);
-
-    // Allow all Vercel domains and localhost for dev
+    // Allow all Vercel deploys & localhost
     if (
-      origin.includes('.vercel.app') ||
-      origin === 'http://localhost:3000'
+      typeof origin === 'string' &&
+      (origin.includes('.vercel.app') ||
+      origin === 'http://localhost:3000' ||
+      origin === 'http://127.0.0.1:3000')
     ) {
       return callback(null, true);
     }
-
-    // Everything else is blocked
     return callback(new Error('CORS policy: Not allowed by AURA backend'), false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -47,15 +45,17 @@ app.use(cors({
 }));
 
 
+
 // 1.1 DDOS Protection (Rate Limiting)
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000,   // 1 minute window
-  max: 300,                  // Allow 300 requests per minute per IP (dev: ok for polling)
+  windowMs: 60 * 1000,    // 1 minute
+  max: 600,               // 600 requests per minute per IP (safe for 1–2s polling)
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Throttling engaged for system stability." }
 });
 app.use(limiter);
+
 
 // 1.2 Multi-Tenant Isolation (Middleware simulation)
 app.use((req, res, next) => {

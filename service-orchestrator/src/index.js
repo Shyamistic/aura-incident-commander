@@ -28,9 +28,12 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow no origin for curl/postman/internal requests
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    // Allow Vercel deploys (.vercel.app) and localhost for local dev
+    if (
+      /^https:\/\/aura-incident-commander(-[a-z0-9]+)?\.vercel\.app$/.test(origin) ||
+      origin === 'http://localhost:3000'
+    ) {
       return callback(null, true);
     }
     return callback(new Error('CORS policy: Not allowed by AURA backend'), false);
@@ -38,6 +41,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
+
 
 // 1.1 DDOS Protection (Rate Limiting)
 const limiter = rateLimit({

@@ -1746,21 +1746,22 @@
 
     // --- Robust Timeline ---
     function updateTimeline(events) {
-        const timeline = document.getElementById('timeline');
-        if (!Array.isArray(events)) return;
-        const recentEvents = events.slice(-5);
+  const timeline = document.getElementById('timeline');
+  if (!Array.isArray(events)) return;
+  const recentEvents = events.slice(-5);
+  timeline.innerHTML = recentEvents.map(evt => {
+      // SAFETY: always get string, then use substring
+      let desc = (typeof evt.detail === "string") ? evt.detail : JSON.stringify(evt.detail ?? "");
+      if (desc.length > 60) desc = desc.substring(0, 60) + "...";
+      return `
+          <div class="timeline-item">
+              <div class="timeline-time">${new Date(evt.ts).toLocaleTimeString()}</div>
+              <div class="timeline-desc">${desc}</div>
+          </div>
+      `;
+  }).join('');
+}
 
-        timeline.innerHTML = recentEvents.map(evt => {
-            let desc = safeString(evt.detail);
-            if (desc.length > 60) desc = desc.substring(0, 60) + "...";
-            return `
-                <div class="timeline-item">
-                    <div class="timeline-time">${new Date(evt.ts).toLocaleTimeString()}</div>
-                    <div class="timeline-desc">${desc}</div>
-                </div>
-            `;
-        }).join('');
-    }
 
         // Deploy Infrastructure
         function deployInfra() {

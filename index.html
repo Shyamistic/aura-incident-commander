@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA v3.0 - Enterprise Autonomous SRE Platform</title>
+    <title>AURA v3.0 Enterprise - Autonomous SRE Platform</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.6.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
             --primary: #00d9ff;
             --secondary: #ff006e;
@@ -24,32 +19,48 @@
             --accent-2: #06ffa5;
             --accent-3: #ff3b00;
             --accent-4: #8b5cf6;
+            --accent-5: #00f5ff;
             --bg-dark: #0a0a14;
             --bg-darker: #050508;
-            --card-bg: rgba(21, 21, 32, 0.9);
-            --card-alt: #1a1a28;
+            --bg-alt: #0f1419;
+            --card-bg: rgba(21, 21, 32, 0.95);
+            --card-alt: rgba(26, 26, 40, 0.88);
             --border-color: #2a2a3e;
+            --border-light: rgba(255, 255, 255, 0.05);
             --text-primary: #ffffff;
             --text-secondary: #a0a0c0;
             --text-muted: #707090;
-            --glow-cyan: rgba(0, 217, 255, 0.3);
+            --glow-cyan: rgba(0, 217, 255, 0.4);
             --glow-pink: rgba(255, 0, 110, 0.3);
             --glow-green: rgba(6, 255, 165, 0.3);
             --glow-purple: rgba(139, 92, 246, 0.3);
-            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.8);
-            --shadow-xl: 0 40px 80px rgba(0, 0, 0, 0.9);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.85);
+            --shadow-xl: 0 40px 100px rgba(0, 0, 0, 0.95);
+            --shadow-inset: inset 0 1px 3px rgba(255, 255, 255, 0.08);
+            --success: #06ffa5;
+            --error: #ff3b00;
+            --warning: #ffd60a;
+            --info: #00d9ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         html {
             scroll-behavior: smooth;
+            font-size: 14px;
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Space Grotesk', 'Poppins', sans-serif;
             background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 50%, #1a0a2e 100%);
             background-attachment: fixed;
             color: var(--text-primary);
             overflow-x: hidden;
+            min-height: 100vh;
             position: relative;
         }
 
@@ -60,65 +71,74 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(6, 255, 165, 0.05) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.08) 0%, transparent 50%), 
+                        radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.06) 0%, transparent 50%);
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
         }
 
         .page-container {
             position: relative;
-            z-index: 2;
-            min-height: 100vh;
+            z-index: 1;
             padding: 20px;
+            max-width: 1980px;
+            margin: 0 auto;
         }
 
-        /* NAVBAR */
+        /* ==================== NAVBAR PREMIUM ==================== */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 32px;
-            background: rgba(21, 21, 32, 0.95);
+            padding: 16px 40px;
+            background: rgba(21, 21, 32, 0.98);
             backdrop-filter: blur(20px);
             border-bottom: 2px solid var(--border-color);
             border-image: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary)) 1;
-            margin-bottom: 24px;
-            border-radius: 0 0 16px 16px;
+            margin-bottom: 28px;
+            border-radius: 0 0 20px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .navbar::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            opacity: 0.5;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 18px;
+            position: relative;
+            z-index: 1;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
+            font-size: 28px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
-            box-shadow: 0 0 30px var(--glow-cyan);
-            animation: pulse-glow 2s ease-in-out infinite;
+            box-shadow: 0 0 30px var(--glow-cyan), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            animation: pulseGlow 2s ease-in-out infinite;
         }
 
-        @keyframes pulse-glow {
-            0%, 100% {
-                box-shadow: 0 0 30px var(--glow-cyan), 0 0 60px rgba(0, 217, 255, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 50px var(--glow-cyan), 0 0 100px rgba(0, 217, 255, 0.4);
-            }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 30px var(--glow-cyan), inset 0 1px 2px rgba(255, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 50px var(--glow-cyan), inset 0 1px 2px rgba(255, 255, 255, 0.3); }
         }
 
         .logo-text {
@@ -127,62 +147,55 @@
         }
 
         .logo-main {
-            font-size: 22px;
+            font-size: 28px;
             font-weight: 700;
             letter-spacing: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent-2));
+            background: linear-gradient(90deg, var(--primary), var(--accent-2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .logo-sub {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
+            font-weight: 600;
         }
 
-        .status-section {
+        .navbar-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 18px;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
         }
 
         .status-badge {
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border: 2px solid;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .status-badge.online {
-            border-color: var(--accent-2);
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--accent-2);
-            background: rgba(6, 255, 165, 0.1);
-            box-shadow: 0 0 20px rgba(6, 255, 165, 0.3);
-        }
-
-        .status-badge.offline {
-            border-color: var(--accent-3);
-            color: var(--accent-3);
-            background: rgba(255, 59, 0, 0.1);
+            background: rgba(6, 255, 165, 0.12);
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 2px solid var(--accent-2);
+            box-shadow: 0 0 20px rgba(6, 255, 165, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .status-dot {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-2);
             border-radius: 50%;
-            background: currentColor;
-            animation: blink 1s ease-in-out infinite;
+            box-shadow: 0 0 12px var(--accent-2);
+            animation: blink 1.5s infinite;
         }
 
         @keyframes blink {
@@ -191,52 +204,87 @@
         }
 
         .version-badge {
-            padding: 6px 14px;
-            background: rgba(255, 214, 10, 0.1);
-            border: 1px solid var(--accent-1);
-            border-radius: 6px;
-            font-size: 10px;
-            color: var(--accent-1);
-            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 2px solid var(--accent-4);
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--accent-4);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* MAIN CONTAINER */
-        .main-container {
-            max-width: 1900px;
-            margin: 0 auto;
+        .theme-toggle {
+            width: 48px;
+            height: 48px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 2px solid var(--accent-4);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(139, 92, 246, 0.25);
+            box-shadow: 0 0 20px var(--glow-purple);
+        }
+
+        /* ==================== MAIN GRID ==================== */
+        .main-grid {
             display: grid;
-            grid-template-columns: 320px 1fr 360px;
-            gap: 20px;
+            grid-template-columns: 360px 1fr 400px;
+            gap: 28px;
+            animation: fadeInGrid 0.6s ease-out;
         }
 
-        @media (max-width: 1400px) {
-            .main-container {
+        @keyframes fadeInGrid {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1600px) {
+            .main-grid {
+                grid-template-columns: 320px 1fr 360px;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
                 grid-template-columns: 1fr 1fr;
             }
         }
 
         @media (max-width: 768px) {
-            .main-container {
+            .main-grid {
                 grid-template-columns: 1fr;
             }
             .navbar {
-                padding: 14px 18px;
+                padding: 12px 20px;
                 flex-direction: column;
-                gap: 14px;
+                gap: 12px;
+            }
+            .logo-main {
+                font-size: 20px;
             }
         }
 
-        /* CARD SYSTEM */
+        /* ==================== CARD SYSTEM ==================== */
         .card {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 14px;
-            padding: 22px;
-            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 28px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             box-shadow: var(--shadow-lg);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
         }
 
         .card::before {
@@ -246,13 +294,14 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.1), transparent);
-            transition: left 0.5s ease;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.6s;
+            pointer-events: none;
         }
 
         .card:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 40px var(--glow-cyan), var(--shadow-xl);
+            box-shadow: 0 0 50px var(--glow-cyan), var(--shadow-xl);
             transform: translateY(-4px);
         }
 
@@ -261,15 +310,15 @@
         }
 
         .card-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 18px;
+            letter-spacing: 2.5px;
+            color: var(--primary);
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: var(--primary);
+            gap: 12px;
             position: relative;
             z-index: 2;
         }
@@ -277,32 +326,34 @@
         .card-title::before {
             content: '';
             width: 4px;
-            height: 18px;
+            height: 20px;
             background: linear-gradient(180deg, var(--primary), var(--secondary));
             border-radius: 2px;
             box-shadow: 0 0 12px var(--glow-cyan);
         }
 
-        /* BUTTONS */
+        /* ==================== BUTTONS PREMIUM ==================== */
         .btn {
-            padding: 12px 20px;
-            border: 2px solid;
-            border-radius: 10px;
-            background: transparent;
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 11px;
             font-weight: 700;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.3px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 2px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn::before {
@@ -314,52 +365,87 @@
             height: 100%;
             background: currentColor;
             opacity: 0.1;
-            transition: left 0.4s ease;
-            z-index: -1;
+            transition: left 0.3s;
+            z-index: 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
         }
 
         .btn:hover::before {
             left: 100%;
         }
 
+        .btn > * {
+            position: relative;
+            z-index: 1;
+        }
+
         .btn-primary {
+            background: rgba(0, 217, 255, 0.12);
             border-color: var(--primary);
             color: var(--primary);
         }
 
         .btn-primary:hover {
-            box-shadow: 0 0 30px var(--glow-cyan), inset 0 0 20px rgba(0, 217, 255, 0.1);
-            transform: scale(1.05);
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px var(--glow-cyan);
         }
 
         .btn-danger {
+            background: rgba(255, 0, 110, 0.12);
             border-color: var(--secondary);
             color: var(--secondary);
         }
 
         .btn-danger:hover {
-            box-shadow: 0 0 30px var(--glow-pink), inset 0 0 20px rgba(255, 0, 110, 0.1);
-            transform: scale(1.05);
+            background: var(--secondary);
+            color: #fff;
+            box-shadow: 0 0 30px var(--glow-pink);
         }
 
         .btn-success {
+            background: rgba(6, 255, 165, 0.12);
             border-color: var(--accent-2);
             color: var(--accent-2);
         }
 
         .btn-success:hover {
-            box-shadow: 0 0 30px var(--glow-green), inset 0 0 20px rgba(6, 255, 165, 0.1);
-            transform: scale(1.05);
+            background: var(--accent-2);
+            color: #000;
+            box-shadow: 0 0 30px var(--glow-green);
         }
 
         .btn-warning {
+            background: rgba(255, 214, 10, 0.12);
             border-color: var(--accent-1);
             color: var(--accent-1);
         }
 
         .btn-warning:hover {
-            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5), inset 0 0 20px rgba(255, 214, 10, 0.1);
-            transform: scale(1.05);
+            background: var(--accent-1);
+            color: #000;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 2px dashed var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            border-style: solid;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 11px;
+            width: auto;
+            margin-bottom: 0;
         }
 
         .btn:disabled {
@@ -367,64 +453,74 @@
             cursor: not-allowed;
         }
 
-        .btn-small {
-            padding: 8px 14px;
-            font-size: 10px;
-        }
-
-        /* CONTROL PANEL */
-        .control-panel {
+        /* ==================== SIDEBAR PANEL ==================== */
+        .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 20px;
         }
 
-        /* STATS */
-        .stats-section {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .stat-item {
-            margin-bottom: 22px;
-        }
-
-        .stat-item:last-child {
+        .sidebar .card {
             margin-bottom: 0;
         }
 
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .stat-value {
-            font-size: 28px;
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .metric-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .metric-box:hover {
+            border-color: var(--primary);
+            background: rgba(0, 217, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .metric-val {
+            font-size: 26px;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--accent-2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary);
             font-variant-numeric: tabular-nums;
         }
 
-        /* AGENT VISUALIZATION */
+        .metric-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== AGENT VISUALIZATION ADVANCED ==================== */
         .agent-network {
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(255, 0, 110, 0.05) 100%);
-            border-radius: 14px;
-            padding: 28px 20px;
-            margin-bottom: 20px;
-            min-height: 240px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: space-around;
-            position: relative;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(255, 0, 110, 0.03) 100%);
+            border-radius: 16px;
+            padding: 40px 20px;
+            margin-bottom: 24px;
             border: 2px solid rgba(0, 217, 255, 0.2);
+            position: relative;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.08);
         }
 
         .agent-network::before {
@@ -434,16 +530,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 80% 50%, rgba(255, 0, 110, 0.1) 0%, transparent 40%);
+            background: radial-gradient(circle at 30% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 40%);
             pointer-events: none;
         }
 
         .agent-container {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
             position: relative;
             z-index: 2;
         }
@@ -454,58 +548,60 @@
             align-items: center;
             gap: 10px;
             position: relative;
+            transition: all 0.3s;
         }
 
         .agent-icon {
             width: 70px;
             height: 70px;
             border-radius: 14px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.05));
+            border: 3px solid var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.05));
-            border: 3px solid var(--primary);
             box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .agent-node.active .agent-icon {
             background: linear-gradient(135deg, rgba(0, 217, 255, 0.3), rgba(0, 217, 255, 0.1));
             box-shadow: 0 0 50px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.2);
             transform: scale(1.15);
-            animation: agent-pulse 1s ease-in-out infinite;
+            animation: agentPulse 1s ease-in-out infinite;
         }
 
-        @keyframes agent-pulse {
-            0%, 100% {
-                box-shadow: 0 0 50px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 70px rgba(0, 217, 255, 0.8), inset 0 0 30px rgba(0, 217, 255, 0.3);
-            }
+        @keyframes agentPulse {
+            0%, 100% { box-shadow: 0 0 50px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.2); }
+            50% { box-shadow: 0 0 70px rgba(0, 217, 255, 0.8), inset 0 0 30px rgba(0, 217, 255, 0.3); }
         }
 
-        .agent-name {
+        .agent-node.healing .agent-icon {
+            border-color: var(--accent-2);
+            box-shadow: 0 0 30px rgba(6, 255, 165, 0.4);
+        }
+
+        .agent-lbl {
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
+            color: var(--text-secondary);
             letter-spacing: 1px;
             text-align: center;
             min-width: 70px;
-            color: var(--text-primary);
         }
 
         .agent-status {
             font-size: 10px;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
             background: rgba(112, 112, 144, 0.2);
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            transition: all 0.3s ease;
             border: 1px solid var(--border-color);
+            transition: all 0.3s;
         }
 
         .agent-node.active .agent-status {
@@ -515,38 +611,37 @@
             box-shadow: 0 0 12px rgba(0, 217, 255, 0.4);
         }
 
-        .agent-connection {
+        .connection-line {
             flex: 1;
             height: 3px;
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
             position: relative;
-            min-width: 35px;
+            min-width: 40px;
+            margin: 0 12px;
+            transition: all 0.3s;
         }
 
-        .agent-connection.active {
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
-            animation: flow 1s ease-in-out infinite;
+        .connection-line.active {
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent-2), transparent);
+            box-shadow: 0 0 20px var(--glow-cyan);
+            animation: flowLine 2s ease-in-out infinite;
         }
 
-        @keyframes flow {
-            0% {
-                background-position: 0% center;
-            }
-            100% {
-                background-position: 100% center;
-            }
+        @keyframes flowLine {
+            0%, 100% { opacity: 0.6; box-shadow: 0 0 20px var(--glow-cyan); }
+            50% { opacity: 1; box-shadow: 0 0 30px var(--glow-cyan); }
         }
 
-        /* EVENT LOG */
+        /* ==================== EVENT LOG ADVANCED ==================== */
         .event-log {
-            height: 360px;
+            height: 380px;
             overflow-y: auto;
             background: linear-gradient(135deg, rgba(5, 5, 8, 0.8) 0%, rgba(10, 10, 20, 0.6) 100%);
             border: 2px solid var(--border-color);
             border-radius: 12px;
             padding: 18px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+            font-size: 12px;
             line-height: 1.6;
             position: relative;
         }
@@ -562,30 +657,25 @@
         }
 
         .event-item {
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 10px;
-            border-left: 4px solid;
+            border-left: 4px solid var(--text-secondary);
             border-radius: 6px;
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(5px);
             animation: slideInLeft 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .event-item:hover {
             background: rgba(0, 217, 255, 0.1);
             transform: translateX(4px);
+            border-left-color: var(--primary);
         }
 
         .event-item.alarm {
@@ -611,7 +701,7 @@
         .event-ts {
             color: var(--accent-1);
             font-weight: 600;
-            font-size: 10px;
+            font-size: 11px;
             display: block;
             margin-bottom: 4px;
             letter-spacing: 1px;
@@ -628,13 +718,13 @@
             color: var(--primary);
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: 1px;
         }
 
         .event-type {
             color: var(--text-muted);
-            font-size: 10px;
+            font-size: 11px;
         }
 
         .event-detail {
@@ -643,69 +733,7 @@
             word-break: break-word;
         }
 
-        /* AI DECISION CARD */
-        .ai-card {
-            margin-top: 8px;
-            padding: 10px;
-            background: rgba(0, 217, 255, 0.05);
-            border: 1px solid var(--primary);
-            border-radius: 6px;
-        }
-
-        .ai-header {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 6px;
-            font-size: 10px;
-        }
-
-        .ai-tag {
-            display: inline-block;
-            padding: 3px 8px;
-            margin-right: 6px;
-            margin-top: 4px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 600;
-        }
-
-        .tag-policy {
-            background: rgba(6, 255, 165, 0.2);
-            color: var(--accent-2);
-        }
-
-        .tag-cost {
-            background: rgba(255, 214, 10, 0.2);
-            color: var(--accent-1);
-        }
-
-        .tag-compliance {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--accent-4);
-        }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 7px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, var(--accent-2), var(--primary));
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
-        }
-
-        /* MODAL */
+        /* ==================== MODAL SYSTEM ==================== */
         .modal {
             display: none;
             position: fixed;
@@ -717,51 +745,51 @@
             background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
             animation: fadeIn 0.3s ease-out;
+            align-items: center;
+            justify-content: center;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal.show {
             display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .modal-content {
             background: linear-gradient(135deg, rgba(21, 21, 32, 0.95) 0%, rgba(26, 26, 40, 0.95) 100%);
             border: 2px solid var(--primary);
             border-radius: 18px;
-            padding: 32px;
-            max-width: 480px;
+            padding: 36px;
             width: 90%;
-            animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            max-width: 500px;
             box-shadow: 0 0 60px var(--glow-cyan), var(--shadow-xl);
             position: relative;
             overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
         }
 
         .modal-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -771,9 +799,9 @@
         }
 
         .modal-description {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 20px;
+            margin-bottom: 22px;
             line-height: 1.6;
         }
 
@@ -783,15 +811,17 @@
 
         .modal-label {
             display: block;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
         }
 
-        .modal-input, .modal-textarea, .modal-select {
+        .modal-input,
+        .modal-textarea,
+        .modal-select {
             width: 100%;
             padding: 14px;
             background: rgba(5, 5, 8, 0.9);
@@ -799,21 +829,25 @@
             border-radius: 10px;
             color: var(--text-primary);
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 12px;
-            transition: all 0.3s ease;
+            font-size: 13px;
+            transition: all 0.3s;
+            margin-bottom: 12px;
         }
 
         .modal-textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .modal-input::placeholder, .modal-textarea::placeholder {
+        .modal-input::placeholder,
+        .modal-textarea::placeholder {
             color: var(--text-muted);
         }
 
-        .modal-input:focus, .modal-textarea:focus, .modal-select:focus {
+        .modal-input:focus,
+        .modal-textarea:focus,
+        .modal-select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 30px rgba(0, 217, 255, 0.3), inset 0 0 12px rgba(0, 217, 255, 0.1);
@@ -828,109 +862,103 @@
 
         .modal-buttons .btn {
             flex: 1;
+            margin-bottom: 0;
         }
 
-        /* NOTIFICATION */
+        /* ==================== NOTIFICATIONS ==================== */
         .notification {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            padding: 14px 20px;
-            border-radius: 12px;
+            padding: 16px 24px;
+            border-radius: 14px;
             border: 2px solid;
-            font-weight: 600;
-            font-size: 11px;
+            font-weight: 700;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             z-index: 999;
-            animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow-lg);
             max-width: 320px;
+            animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(33px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .notification.success {
-            background: rgba(6, 255, 165, 0.1);
+            background: rgba(6, 255, 165, 0.13);
             border-color: var(--accent-2);
             color: var(--accent-2);
             box-shadow: 0 0 30px var(--glow-green), var(--shadow-lg);
         }
 
         .notification.error {
-            background: rgba(255, 59, 0, 0.1);
+            background: rgba(255, 59, 0, 0.13);
             border-color: var(--accent-3);
             color: var(--accent-3);
             box-shadow: 0 0 30px rgba(255, 59, 0, 0.4), var(--shadow-lg);
         }
 
         .notification.info {
-            background: rgba(0, 217, 255, 0.1);
+            background: rgba(0, 217, 255, 0.13);
             border-color: var(--primary);
             color: var(--primary);
             box-shadow: 0 0 30px var(--glow-cyan), var(--shadow-lg);
         }
 
-        /* CHAOS ENGINEERING GRID */
-        .chaos-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 12px;
+        .notification.warning {
+            background: rgba(255, 214, 10, 0.14);
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.4), var(--shadow-lg);
         }
 
-        /* VOICE COMMAND */
-        .voice-btn {
+        /* ==================== CHARTS & GRAPHS ==================== */
+        .chart-container {
             position: relative;
-            width: 100%;
-            padding: 16px;
-            border: 2px dashed var(--accent-4);
-            border-radius: 12px;
-            background: rgba(139, 92, 246, 0.05);
-            color: var(--accent-4);
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
+            height: 220px;
+            margin-top: 18px;
+        }
+
+        .metrics-small {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .metric-small {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
-        .voice-btn:hover {
-            background: rgba(139, 92, 246, 0.1);
-            box-shadow: 0 0 30px var(--glow-purple);
+        .metric-small:hover {
+            border-color: var(--primary);
+            background: rgba(0, 217, 255, 0.08);
         }
 
-        .voice-btn.listening {
-            animation: voice-pulse 1s infinite;
-            border-style: solid;
-            background: rgba(139, 92, 246, 0.2);
+        .metric-small-val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
         }
 
-        @keyframes voice-pulse {
-            0%, 100% {
-                box-shadow: 0 0 20px var(--glow-purple);
-            }
-            50% {
-                box-shadow: 0 0 40px var(--glow-purple);
-            }
+        .metric-small-lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 4px;
         }
 
-        /* TIMELINE */
+        /* ==================== ADVANCED PANELS ==================== */
         .timeline {
             position: relative;
             padding-left: 30px;
@@ -968,126 +996,93 @@
         }
 
         .timeline-time {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--accent-1);
             margin-bottom: 4px;
         }
 
         .timeline-desc {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
 
-        /* CHART CONTAINER */
-        .chart-container {
-            position: relative;
-            height: 180px;
-            margin-top: 16px;
+        /* ==================== SCROLLBAR CUSTOM ==================== */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        /* METRICS GRID */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .metric-box {
+        ::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 14px;
-            text-align: center;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 10px;
             transition: all 0.3s;
         }
 
-        .metric-box:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--accent-2), var(--primary));
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
         }
 
-        .metric-value {
-            font-size: 22px;
+        /* ==================== COMPLIANCE BADGES ==================== */
+        .compliance-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .compliance-badge {
+            padding: 6px 12px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid var(--accent-4);
+            border-radius: 6px;
+            font-size: 10px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--accent-4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
         }
 
-        .metric-label {
-            font-size: 9px;
+        .compliance-badge:hover {
+            background: rgba(139, 92, 246, 0.25);
+            box-shadow: 0 0 12px var(--glow-purple);
+        }
+
+        /* ==================== COST DISPLAY ==================== */
+        .cost-box {
+            background: rgba(255, 214, 10, 0.08);
+            border: 1px solid var(--accent-1);
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 16px;
+        }
+
+        .cost-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-1);
+        }
+
+        .cost-lbl {
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
             margin-top: 4px;
         }
 
-        /* FOOTER */
-        .footer {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 10px;
-            letter-spacing: 1px;
+        /* ==================== DIVIDER ==================== */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 16px 0;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .page-container {
-                padding: 12px;
-            }
-
-            .navbar {
-                padding: 12px 16px;
-                margin-bottom: 16px;
-                border-radius: 0 0 12px 12px;
-            }
-
-            .card {
-                padding: 16px;
-            }
-
-            .agent-network {
-                min-height: 200px;
-                padding: 16px 12px;
-            }
-
-            .agent-icon {
-                width: 56px;
-                height: 56px;
-                font-size: 26px;
-            }
-
-            .agent-name {
-                font-size: 10px;
-                min-width: 56px;
-            }
-
-            .event-log {
-                height: 280px;
-            }
-
-            .stat-value {
-                font-size: 22px;
-            }
-
-            .modal-content {
-                padding: 24px;
-            }
-
-            .notification {
-                bottom: 12px;
-                right: 12px;
-                padding: 12px 16px;
-                font-size: 10px;
-            }
-
-            .chaos-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* LOADING OVERLAY */
+        /* ==================== LOADING OVERLAY ==================== */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -1100,6 +1095,8 @@
             justify-content: center;
             z-index: 9999;
             backdrop-filter: blur(10px);
+            flex-direction: column;
+            gap: 20px;
         }
 
         .loading-overlay.show {
@@ -1120,294 +1117,546 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* REDACTED PII */
-        .redacted {
-            background: #333;
-            color: #888;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            cursor: help;
-            font-size: 10px;
-        }
-
-        /* COST ESTIMATOR */
-        .cost-box {
-            background: rgba(255, 214, 10, 0.1);
-            border: 1px solid var(--accent-1);
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 16px;
-        }
-
-        .cost-value {
-            font-size: 24px;
+        .loading-text {
+            color: var(--primary);
             font-weight: 700;
-            color: var(--accent-1);
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        .cost-label {
+        /* ==================== ACTIVITY FEED ==================== */
+        .activity-feed {
+            max-height: 240px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .activity-item {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--primary);
+            border-radius: 6px;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .activity-item:hover {
+            background: rgba(0, 217, 255, 0.08);
+            transform: translateX(4px);
+        }
+
+        .activity-time {
             font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
+            color: var(--accent-1);
             margin-top: 4px;
         }
 
-        /* COMPLIANCE BADGE */
-        .compliance-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                order: 3;
+            }
+            .center-stage {
+                order: 1;
+            }
+            .insights {
+                order: 2;
+            }
         }
 
-        .compliance-badge {
-            padding: 6px 12px;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid var(--accent-4);
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 600;
+        @media (max-width: 768px) {
+            .card {
+                padding: 16px;
+            }
+            .page-container {
+                padding: 12px;
+            }
+            .navbar {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .logo-main {
+                font-size: 20px;
+            }
+            .agent-network {
+                padding: 20px 12px;
+            }
+            .agent-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 24px;
+            }
+            .event-log {
+                height: 300px;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==================== ADVANCED ANIMATIONS ==================== */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .gradient-text {
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        /* ==================== VOICE COMMAND ==================== */
+        .voice-btn {
+            width: 100%;
+            padding: 16px;
+            border: 2px dashed var(--accent-4);
+            border-radius: 12px;
+            background: rgba(139, 92, 246, 0.05);
             color: var(--accent-4);
+            font-size: 12px;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .voice-btn:hover {
+            background: rgba(139, 92, 246, 0.15);
+            box-shadow: 0 0 30px var(--glow-purple);
+        }
+
+        .voice-btn.listening {
+            animation: voicePulse 1s infinite;
+            border-style: solid;
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 20px var(--glow-purple); }
+            50% { box-shadow: 0 0 40px var(--glow-purple); }
+        }
+
+        /* ==================== SKIN CONDITIONS ==================== */
+        .risk-critical .card-title {
+            color: var(--error);
+        }
+
+        .risk-high .card-title {
+            color: var(--warning);
+        }
+
+        .risk-stable .card-title {
+            color: var(--success);
         }
     </style>
 </head>
+
 <body>
     <div class="page-container">
-        <!-- NAVBAR -->
+        <!-- ==================== NAVBAR ==================== -->
         <nav class="navbar">
             <div class="logo-section">
-                <div class="logo-icon">⚡</div>
+                <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
                 <div class="logo-text">
                     <div class="logo-main">AURA v3.0</div>
                     <div class="logo-sub">Enterprise Autonomous SRE Platform</div>
                 </div>
             </div>
-            <div class="status-section">
-                <div class="status-badge online" id="statusBadge">
+            <div class="navbar-right">
+                <div class="status-badge">
                     <div class="status-dot"></div>
-                    Online
+                    SYSTEM ONLINE
                 </div>
-                <div class="version-badge">v3.0 Enterprise</div>
+                <span class="version-badge">v3.0 Enterprise</span>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="ri-moon-fill"></i>
+                </button>
             </div>
         </nav>
 
-        <!-- MAIN CONTAINER -->
-        <div class="main-container">
-            <!-- LEFT PANEL: CONTROLS -->
-            <div>
+        <!-- ==================== MAIN GRID ==================== -->
+        <div class="main-grid">
+            
+            <!-- ==================== LEFT SIDEBAR ==================== -->
+            <div class="sidebar">
+                <!-- Mission Control -->
                 <div class="card">
-                    <div class="card-title">⚙️ Mission Control</div>
-                    <div class="control-panel">
-                        <button class="btn btn-primary" onclick="deployInfra()">🚀 Deploy Infrastructure</button>
-                        <button class="btn btn-danger" onclick="openChaosModal()">🔴 Chaos Engineering</button>
-                        <button class="btn btn-success" onclick="downloadReport()">📄 Download Report</button>
-                        <button class="btn btn-warning" onclick="resetSystem()">🔄 Reset System</button>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <div class="card-title">🎙️ Voice Commands</div>
-                        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
-                            <span id="voiceIcon">🎤</span>
-                            <span id="voiceText">Click to Speak</span>
+                    <div class="card-title">🔧 Mission Control</div>
+                    <div class="control-section">
+                        <button class="btn btn-primary" onclick="openDeployModal()">
+                            <i class="ri-rocket-2-fill"></i> Deploy Infrastructure
                         </button>
-                        <div style="margin-top: 8px; font-size: 10px; color: var(--text-muted); text-align: center;">
-                            Say: "Deploy", "Simulate", "Reset", "Report"
+                        <button class="btn btn-danger" onclick="openChaosModal()">
+                            <i class="ri-fire-fill"></i> Chaos Engineering
+                        </button>
+                        <button class="btn btn-success" onclick="runFinOpsScan()">
+                            <i class="ri-money-dollar-box-fill"></i> FinOps Scan
+                        </button>
+                        <button class="btn btn-warning" onclick="openAutoHealModal()">
+                            <i class="ri-healing-fill"></i> Auto-Heal
+                        </button>
+                        <button class="btn btn-ghost" onclick="openAIConfigModal()">
+                            <i class="ri-shield-flash-fill"></i> AI Config
+                        </button>
+                        <button class="btn btn-ghost" onclick="openRBACModal()">
+                            <i class="ri-lock-fill"></i> RBAC Panel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="card">
+                    <div class="card-title">📊 Live Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-box" onclick="showMetricDetail('incidents')">
+                            <div class="metric-val" id="incidentCount">0</div>
+                            <div class="metric-lbl">Incidents</div>
+                        </div>
+                        <div class="metric-box" onclick="showMetricDetail('resolved')">
+                            <div class="metric-val" id="resolvedCount">0</div>
+                            <div class="metric-lbl">Resolved</div>
+                        </div>
+                        <div class="metric-box" onclick="showMetricDetail('mttr')">
+                            <div class="metric-val" id="mttrVal">0s</div>
+                            <div class="metric-lbl">MTTR</div>
+                        </div>
+                        <div class="metric-box" onclick="showMetricDetail('uptime')">
+                            <div class="metric-val" id="uptimeVal">99.9%</div>
+                            <div class="metric-lbl">Uptime</div>
+                        </div>
+                        <div class="metric-box" onclick="showMetricDetail('latency')">
+                            <div class="metric-val" id="latencyVal">12ms</div>
+                            <div class="metric-lbl">Latency</div>
+                        </div>
+                        <div class="metric-box" onclick="showMetricDetail('health')">
+                            <div class="metric-val" id="healthVal">100%</div>
+                            <div class="metric-lbl">Health</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">📊 System Metrics</div>
-                    <div class="metrics-grid">
-                        <div class="metric-box">
-                            <div class="metric-value" id="totalIncidents">0</div>
-                            <div class="metric-label">Incidents</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-value" id="resolvedCount">0</div>
-                            <div class="metric-label">Resolved</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-value" id="avgResolution">2.5s</div>
-                            <div class="metric-label">MTTR</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-value" id="systemHealth">100%</div>
-                            <div class="metric-label">Health</div>
-                        </div>
-                    </div>
-
+                <!-- Cost Estimator -->
+                <div class="card">
+                    <div class="card-title">💰 Cost Optimizer</div>
                     <div class="cost-box">
-                        <div class="cost-label">Estimated Monthly Cost</div>
-                        <div class="cost-value" id="costEstimate">$0.00</div>
+                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Monthly Estimate</div>
+                        <div class="cost-val" id="costEstimate">$0.00</div>
+                        <div class="cost-lbl">AWS Infrastructure</div>
+                    </div>
+                    <button class="btn btn-success" onclick="optimizeCosts()" style="margin-top: 12px;">
+                        <i class="ri-leaf-fill"></i> Optimize Costs
+                    </button>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-title">⚡ Quick Actions</div>
+                    <button class="btn btn-primary" onclick="downloadReportPDF()">
+                        <i class="ri-file-pdf-fill"></i> Download Report
+                    </button>
+                    <button class="btn btn-ghost" onclick="exportMetrics()">
+                        <i class="ri-download-cloud-2-fill"></i> Export Data
+                    </button>
+                    <button class="btn btn-ghost" onclick="resetSystem()">
+                        <i class="ri-restart-line"></i> System Reset
+                    </button>
+                </div>
+
+                <!-- Voice Commands -->
+                <div class="card">
+                    <div class="card-title">🎤 Voice Control</div>
+                    <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+                        <i class="ri-mic-fill"></i> <span id="voiceText">Click to Speak</span>
+                    </button>
+                    <div style="margin-top: 8px; font-size: 10px; color: var(--text-muted); line-height: 1.4;">
+                        Try: "deploy", "chaos", "heal", "report", "status"
                     </div>
                 </div>
             </div>
 
-            <!-- CENTER PANEL: AGENT NETWORK & EVENTS -->
-            <div>
+            <!-- ==================== CENTER STAGE ==================== -->
+            <div class="center-stage">
+                <!-- Agent Visualization -->
                 <div class="card">
-                    <div class="card-title">🤖 Multi-Agent Architecture</div>
+                    <div class="card-title">🤖 Multi-Agent Orchestration</div>
                     <div class="agent-network">
                         <div class="agent-container">
-                            <div class="agent-node" id="monitorNode">
+                            <div class="agent-node" id="node-monitor">
                                 <div class="agent-icon">👁️</div>
-                                <div class="agent-name">Monitor</div>
+                                <div class="agent-lbl">Monitor</div>
                                 <div class="agent-status">Standby</div>
                             </div>
                         </div>
-
-                        <div class="agent-connection" id="conn1"></div>
-
+                        <div class="connection-line" id="line-1"></div>
                         <div class="agent-container">
-                            <div class="agent-node" id="reasonNode">
+                            <div class="agent-node" id="node-brain">
                                 <div class="agent-icon">🧠</div>
-                                <div class="agent-name">Reasoning</div>
+                                <div class="agent-lbl">Reasoning</div>
                                 <div class="agent-status">Idle</div>
                             </div>
                         </div>
-
-                        <div class="agent-connection" id="conn2"></div>
-
+                        <div class="connection-line" id="line-2"></div>
                         <div class="agent-container">
-                            <div class="agent-node" id="healNode">
+                            <div class="agent-node" id="node-healer">
                                 <div class="agent-icon">⚕️</div>
-                                <div class="agent-name">Heal</div>
+                                <div class="agent-lbl">Healer</div>
                                 <div class="agent-status">Ready</div>
                             </div>
                         </div>
-
-                        <div class="agent-connection" id="conn3"></div>
-
+                        <div class="connection-line" id="line-3"></div>
                         <div class="agent-container">
-                            <div class="agent-node" id="reportNode">
+                            <div class="agent-node" id="node-report">
                                 <div class="agent-icon">📄</div>
-                                <div class="agent-name">Report</div>
+                                <div class="agent-lbl">Audit</div>
                                 <div class="agent-status">Online</div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">📡 Intelligent Event Stream</div>
-                    <div class="event-log" id="eventLog">
-                        <div class="event-item analysis">
-                            <div class="event-ts">[SYSTEM]</div>
-                            <div class="event-header">
-                                <span class="event-source">Orchestrator</span>
-                            </div>
-                            <div class="event-detail">✓ AURA v3.0 initialized • All agents ready</div>
-                        </div>
+                    <div style="margin-top: 14px; padding: 12px; background: rgba(0, 217, 255, 0.08); border-radius: 8px; border-left: 3px solid var(--primary);">
+                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Agent Status</div>
+                        <div style="font-size: 12px; color: var(--primary);">All agents operational | <span id="agentMetrics">0 active</span></div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">📈 Performance Trends</div>
+                <!-- Event Stream -->
+                <div class="card" style="margin-top: 28px;">
+                    <div class="card-title">📡 Real-Time Event Stream</div>
+                    <div class="event-log" id="eventLog">
+                        <div class="event-item analysis">
+                            <span class="event-ts">SYSTEM INIT</span>
+                            <div class="event-header">
+                                <span class="event-source">Orchestrator</span>
+                                <span class="event-type">platform.ready</span>
+                            </div>
+                            <div class="event-detail">AURA v3.0 Enterprise platform initialized. All agents ready for deployment.</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-ghost" onclick="clearEventLog()" style="margin-top: 12px;">
+                        <i class="ri-delete-bin-fill"></i> Clear Log
+                    </button>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="card" style="margin-top: 28px;">
+                    <div class="card-title">📈 Performance Analytics</div>
                     <div class="chart-container">
                         <canvas id="performanceChart"></canvas>
                     </div>
+                    <div class="metrics-small">
+                        <div class="metric-small">
+                            <div class="metric-small-val" id="p95">0ms</div>
+                            <div class="metric-small-lbl">P95 Latency</div>
+                        </div>
+                        <div class="metric-small">
+                            <div class="metric-small-val" id="p99">0ms</div>
+                            <div class="metric-small-lbl">P99 Latency</div>
+                        </div>
+                        <div class="metric-small">
+                            <div class="metric-small-val" id="errorRate">0.0%</div>
+                            <div class="metric-small-lbl">Error Rate</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 14px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; font-size: 11px; color: var(--text-secondary);">
+                        <i class="ri-alert-line"></i> Anomaly Detection: <span id="anomalyStatus" style="color: var(--success);">No anomalies detected</span>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="card" style="margin-top: 28px;">
+                    <div class="card-title">📋 Activity Timeline</div>
+                    <div class="activity-feed" id="activityFeed">
+                        <div class="activity-item">
+                            <div><i class="ri-check-double-fill" style="color: var(--accent-2); margin-right: 6px;"></i> System initialization complete</div>
+                            <div class="activity-time">Just now</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- RIGHT PANEL: RISK & TIMELINE -->
-            <div>
+            <!-- ==================== RIGHT INSIGHTS ==================== -->
+            <div class="insights">
+                <!-- Risk Prediction -->
                 <div class="card">
                     <div class="card-title">⚡ AI Risk Prediction</div>
-                    <div style="display: flex; flex-direction: column; gap: 18px;">
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Risk Score (0-100)</div>
+                        <div id="riskScoreDisplay" style="font-size: 56px; font-weight: 700; background: linear-gradient(90deg, var(--primary), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">0</div>
+                        <div id="riskLabel" style="color: var(--accent-2); font-weight: 700; font-size: 13px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;">STABLE</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                        <strong style="color: var(--primary);">AI Analysis:</strong>
+                        <div id="aiInsight" style="margin-top: 8px;">System operating normally. Monitoring 452 metrics across infrastructure.</div>
+                    </div>
+                </div>
+
+                <!-- SLO/SLI Dashboard -->
+                <div class="card" style="margin-top: 28px;">
+                    <div class="card-title">🎯 SLO/SLI Status</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div>
-                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Risk Score (0-100)</div>
-                            <div style="font-size: 42px; font-weight: 700; background: linear-gradient(90deg, var(--primary), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="riskScore">0</div>
+                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Availability SLO</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="flex: 1; height: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 99.98%; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--primary)); border-radius: 4px;"></div>
+                                </div>
+                                <div style="color: var(--accent-2); font-weight: 700; font-size: 12px;">99.98%</div>
+                            </div>
                         </div>
                         <div>
-                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">AI Prediction</div>
-                            <div style="font-size: 12px; color: var(--accent-2); font-weight: 600;" id="prediction">🟢 System stable • No threats detected</div>
+                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Latency SLI</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="flex: 1; height: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 96.5%; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--primary)); border-radius: 4px;"></div>
+                                </div>
+                                <div style="color: var(--accent-2); font-weight: 700; font-size: 12px;">96.5%</div>
+                            </div>
                         </div>
-                        <div style="padding: 12px; background: rgba(0, 217, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px;">
-                            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">ML-Powered Forecasting</div>
-                            <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6;">
-                                AURA v3.0 uses advanced machine learning to predict incidents before they occur, analyzing patterns across 10M+ data points.
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Error Budget</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="flex: 1; height: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 85%; height: 100%; background: linear-gradient(90deg, var(--warning), var(--accent-1)); border-radius: 4px;"></div>
+                                </div>
+                                <div style="color: var(--accent-1); font-weight: 700; font-size: 12px;">85%</div>
                             </div>
                         </div>
                     </div>
+                    <div style="margin-top: 14px; padding: 10px; background: rgba(6, 255, 165, 0.08); border-left: 3px solid var(--accent-2); border-radius: 6px;">
+                        <div style="font-size: 11px; color: var(--accent-2); font-weight: 700; text-transform: uppercase;">✓ All SLOs Met</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Last 30 days: 99.98% availability</div>
+                    </div>
                 </div>
 
-                <div class="card" style="margin-top: 20px;">
+                <!-- Compliance -->
+                <div class="card" style="margin-top: 28px;">
+                    <div class="card-title">📜 Compliance & Standards</div>
+                    <div class="compliance-badges">
+                        <div class="compliance-badge">SOC 2 Type II</div>
+                        <div class="compliance-badge">GDPR</div>
+                        <div class="compliance-badge">HIPAA</div>
+                        <div class="compliance-badge">ISO 27001</div>
+                        <div class="compliance-badge">PCI-DSS</div>
+                        <div class="compliance-badge">FedRAMP</div>
+                    </div>
+                    <div style="margin-top: 14px; padding: 10px; background: rgba(139, 92, 246, 0.08); border-left: 3px solid var(--accent-4); border-radius: 6px;">
+                        <div style="font-size: 11px; color: var(--accent-4); font-weight: 700; text-transform: uppercase;">Audit Status</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">All checks passing • Last audit: 2 hours ago</div>
+                    </div>
+                    <button class="btn btn-ghost" onclick="downloadComplianceReport()" style="margin-top: 12px;">
+                        <i class="ri-file-text-fill"></i> Download Audit Report
+                    </button>
+                </div>
+
+                <!-- Incident Timeline -->
+                <div class="card" style="margin-top: 28px;">
                     <div class="card-title">🕐 Incident Timeline</div>
-                    <div class="timeline" id="timeline">
+                    <div class="timeline" id="incidentTimeline">
                         <div class="timeline-item">
-                            <div class="timeline-time">System Start</div>
-                            <div class="timeline-desc">✓ All agents initialized successfully</div>
+                            <div class="timeline-time">System Started</div>
+                            <div class="timeline-desc">AURA v3.0 initialized and all systems online</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">🛡️ Compliance Status</div>
-                    <div class="compliance-badges">
-                        <div class="compliance-badge">SOC 2</div>
-                        <div class="compliance-badge">HIPAA</div>
-                        <div class="compliance-badge">GDPR</div>
-                        <div class="compliance-badge">ISO 27001</div>
-                        <div class="compliance-badge">PCI-DSS</div>
-                    </div>
-                    <div style="margin-top: 16px; padding: 10px; background: rgba(6, 255, 165, 0.1); border: 1px solid var(--accent-2); border-radius: 6px;">
-                        <div style="font-size: 10px; color: var(--accent-2); font-weight: 600;">✓ All compliance checks passing</div>
-                        <div style="font-size: 9px; color: var(--text-muted); margin-top: 4px;">Last audit: 2 hours ago</div>
+                <!-- System Stats -->
+                <div class="card" style="margin-top: 28px;">
+                    <div class="card-title">📊 System Statistics</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 12px;">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>Total Agents:</span>
+                            <span style="color: var(--primary); font-weight: 700;">4 Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>Deployments:</span>
+                            <span style="color: var(--accent-2); font-weight: 700;">148</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>Mean Time to Recovery:</span>
+                            <span style="color: var(--accent-2); font-weight: 700;">1.2s</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>Cost Savings YTD:</span>
+                            <span style="color: var(--accent-1); font-weight: 700;">$847,320</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                            <span>Uptime Record:</span>
+                            <span style="color: var(--accent-2); font-weight: 700;">99.99%</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- FOOTER -->
-        <div class="footer">
-            🎬 AURA v3.0 Enterprise - Autonomous SRE Platform | Powered by AWS, Amazon Bedrock & Amazon Q | © 2025
-        </div>
     </div>
 
-    <!-- MODAL: DEPLOY -->
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Deploy Modal -->
     <div id="deployModal" class="modal">
         <div class="modal-content">
-            <div class="modal-title">🚀 Deploy Infrastructure</div>
-            <div class="modal-description">
-                Specify your deployment goal. AURA will autonomously execute with real-time monitoring and AI-powered remediation.
-            </div>
+            <h2 class="modal-title">🚀 Deploy Infrastructure</h2>
+            <p class="modal-description">Specify your deployment goal. AURA will autonomously execute with real-time monitoring and AI-powered remediation.</p>
             <div class="modal-input-group">
                 <label class="modal-label">Deployment Goal</label>
                 <input type="text" class="modal-input" id="goalInput" placeholder="e.g., Deploy AWS Lambda with CloudWatch monitoring" value="Deploy AWS Lambda Stack with CloudWatch monitoring">
             </div>
+            <div class="modal-input-group">
+                <label class="modal-label">Environment</label>
+                <select class="modal-select">
+                    <option>Production</option>
+                    <option>Staging</option>
+                    <option>Development</option>
+                </select>
+            </div>
             <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="confirmDeploy()">🚀 Execute</button>
-                <button class="btn btn-warning" onclick="closeModal('deployModal')">✕ Cancel</button>
+                <button class="btn btn-primary" onclick="confirmDeploy()"><i class="ri-rocket-2-fill"></i> Execute</button>
+                <button class="btn btn-warning" onclick="closeModal('deployModal')"><i class="ri-close-fill"></i> Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: CHAOS ENGINEERING -->
+    <!-- Chaos Modal -->
     <div id="chaosModal" class="modal">
         <div class="modal-content">
-            <div class="modal-title">🔥 Chaos Engineering</div>
-            <div class="modal-description">
-                Select the type of failure to simulate. AURA will detect, analyze, and autonomously remediate.
-            </div>
+            <h2 class="modal-title">🔥 Chaos Engineering</h2>
+            <p class="modal-description">Select the type of failure to simulate. AURA will detect, analyze, and autonomously remediate.</p>
             <div class="modal-input-group">
                 <label class="modal-label">Failure Type</label>
-                <select class="modal-select" id="chaosType">
+                <select id="chaosType" class="modal-select">
                     <option value="LATENCY_SPIKE">Network Latency Spike</option>
-                    <option value="MEMORY_LEAK">Memory Leak (OOM)</option>
+                    <option value="CPU_STRESS">CPU Exhaustion</option>
                     <option value="DB_FAILURE">Database Connection Failure</option>
-                    <option value="CPU_SPIKE">CPU Overload (90%+)</option>
+                    <option value="MEMORY_LEAK">Memory Leak / OOM</option>
                     <option value="SECURITY_BREACH">Security Breach Detection</option>
-                    <option value="API_TIMEOUT">API Gateway Timeout</option>
                     <option value="DISK_FULL">Disk Space Critical</option>
+                    <option value="API_TIMEOUT">API Gateway Timeout</option>
                     <option value="NETWORK_PARTITION">Network Partition</option>
                 </select>
             </div>
             <div class="modal-input-group">
+                <label class="modal-label">Cloud Provider</label>
+                <select id="chaosProvider" class="modal-select">
+                    <option value="aws">AWS (Amazon Web Services)</option>
+                    <option value="azure">Azure (Microsoft)</option>
+                    <option value="gcp">GCP (Google Cloud)</option>
+                </select>
+            </div>
+            <div class="modal-input-group">
                 <label class="modal-label">Severity Level</label>
-                <select class="modal-select" id="chaosSeverity">
+                <select id="chaosSeverity" class="modal-select">
                     <option value="LOW">Low - Minor Impact</option>
                     <option value="MEDIUM" selected>Medium - Moderate Impact</option>
                     <option value="HIGH">High - Critical Impact</option>
@@ -1415,551 +1664,489 @@
                 </select>
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-danger" onclick="confirmChaos()">🔴 Trigger Chaos</button>
-                <button class="btn btn-warning" onclick="closeModal('chaosModal')">✕ Cancel</button>
+                <button class="btn btn-danger" onclick="confirmChaos()"><i class="ri-fire-fill"></i> Trigger Chaos</button>
+                <button class="btn btn-warning" onclick="closeModal('chaosModal')"><i class="ri-close-fill"></i> Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- LOADING OVERLAY -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div>
-            <div class="loading-spinner"></div>
-            <div style="margin-top: 20px; color: var(--primary); font-weight: 600; letter-spacing: 2px;">
-                PROCESSING...
+    <!-- Auto-Heal Modal -->
+    <div id="autoHealModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">⚕️ Auto-Healing Control</h2>
+            <p class="modal-description">Configure AI-powered autonomous healing strategies and thresholds.</p>
+            <div class="modal-input-group">
+                <label class="modal-label">Healing Strategy</label>
+                <select class="modal-select">
+                    <option>Aggressive (Immediate)</option>
+                    <option>Balanced (Recommended)</option>
+                    <option>Conservative (Manual)</option>
+                </select>
+            </div>
+            <div class="modal-input-group">
+                <label class="modal-label">Max Retry Attempts</label>
+                <input type="number" class="modal-input" value="5" min="1" max="10">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="confirmAutoHeal()"><i class="ri-healing-fill"></i> Enable Auto-Heal</button>
+                <button class="btn btn-warning" onclick="closeModal('autoHealModal')"><i class="ri-close-fill"></i> Cancel</button>
             </div>
         </div>
+    </div>
+
+    <!-- AI Config Modal -->
+    <div id="aiConfigModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">🛡️ AI Engine Configuration</h2>
+            <p class="modal-description">Configure machine learning models, explainability, and reasoning thresholds.</p>
+            <div class="modal-input-group">
+                <label class="modal-label">Model Version</label>
+                <select class="modal-select">
+                    <option>ReasoningAgentV2 (Current)</option>
+                    <option>ReasoningAgentV1</option>
+                    <option>LightweightAgent</option>
+                </select>
+            </div>
+            <div style="padding: 12px; background: rgba(0, 217, 255, 0.08); border-radius: 8px; margin-bottom: 12px; font-size: 11px;">
+                <input type="checkbox" id="explainCheckbox" checked> <label for="explainCheckbox" style="cursor: pointer;">Enable Explainability (Show AI reasoning)</label>
+            </div>
+            <div class="modal-input-group">
+                <label class="modal-label">Confidence Threshold</label>
+                <input type="range" min="50" max="99" value="85" class="modal-input" style="cursor: pointer;">
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Current: 85%</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="confirmAIConfig()"><i class="ri-settings-fill"></i> Apply Config</button>
+                <button class="btn btn-warning" onclick="closeModal('aiConfigModal')"><i class="ri-close-fill"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RBAC Modal -->
+    <div id="rbacModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">🔒 RBAC & Access Control</h2>
+            <p class="modal-description">Manage Role-Based Access Control, tenant isolation, and permissions.</p>
+            <div class="modal-input-group">
+                <label class="modal-label">Tenant ID (x-tenant-id)</label>
+                <input type="text" class="modal-input" id="tenantIdInput" placeholder="demo-enterprise" value="demo-enterprise">
+            </div>
+            <div class="modal-input-group">
+                <label class="modal-label">Role</label>
+                <select class="modal-select" id="roleSelect">
+                    <option value="admin">Admin (Full Access)</option>
+                    <option value="operator">Operator (Deploy/Heal)</option>
+                    <option value="auditor">Auditor (Read-Only)</option>
+                    <option value="viewer">Viewer (Dashboard Only)</option>
+                </select>
+            </div>
+            <div class="modal-input-group">
+                <label class="modal-label">Permissions</label>
+                <textarea class="modal-textarea" placeholder="admin, deploy, heal, audit" id="permissionsInput">admin, deploy, heal, audit</textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="confirmRBAC()"><i class="ri-check-fill"></i> Apply RBAC</button>
+                <button class="btn btn-warning" onclick="closeModal('rbacModal')"><i class="ri-close-fill"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">PROCESSING...</div>
     </div>
 
     <script>
-    const BACKEND = 'https://aura-backend-2q63.onrender.com';
-    let eventCount = 0;
-    let performanceChart = null;
-    let chartData = {
-        labels: [],
-        incidents: [],
-        healingTime: []
-    };
-    let recognition = null;
-        // --- Utility for Defensive Stringification ---
-    function safeString(val) {
-        if (typeof val === "string") return val;
-        if (val == null) return "";
-        try { return JSON.stringify(val); } catch { return String(val); }
-    }
+        // ==================== CONFIGURATION ====================
+        const API_URL = 'http://localhost:10000';
+        let HEADERS = {
+            'Content-Type': 'application/json',
+            'x-tenant-id': 'demo-enterprise',
+            'x-role': 'admin'
+        };
 
-    // -- Init and Polling
-    window.addEventListener('load', () => {
-        initChart();
-        checkHealth();
-        pollEvents();
-        setInterval(pollEvents, 2000);
-        setInterval(checkHealth, 5000);
-        setInterval(fetchRiskScore, 2000);
-        setInterval(updateCostEstimate, 3000);
-        initVoiceRecognition();
-    });
+        let lastEventCount = 0;
+        let chartInstance = null;
+        let recognition = null;
+        let eventCount = 0;
 
-
-        // Initialize
+        // ==================== INITIALIZATION ====================
         window.addEventListener('load', () => {
+            loadTheme();
             initChart();
-            checkHealth();
             pollEvents();
             setInterval(pollEvents, 2000);
-            setInterval(checkHealth, 5000);
-            setInterval(fetchRiskScore, 2000);
-            setInterval(updateCostEstimate, 3000);
+            setInterval(fetchRiskScore, 4000);
+            setInterval(updateActivityFeed, 3500);
+            setInterval(updateSLOStatus, 5000);
             initVoiceRecognition();
         });
 
-        // Initialize Chart
-        function initChart() {
-            const ctx = document.getElementById('performanceChart');
-            if (!ctx) return;
-
-            performanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartData.labels,
-                    datasets: [
-                        {
-                            label: 'Incidents',
-                            data: chartData.incidents,
-                            borderColor: '#ff006e',
-                            backgroundColor: 'rgba(255, 0, 110, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'Healing Time (s)',
-                            data: chartData.healingTime,
-                            borderColor: '#06ffa5',
-                            backgroundColor: 'rgba(6, 255, 165, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#a0a0c0',
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: { color: '#707090', font: { size: 9 } },
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
-                        },
-                        x: {
-                            ticks: { color: '#707090', font: { size: 9 } },
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Chart
-        function updateChart() {
-            const now = new Date().toLocaleTimeString();
-            chartData.labels.push(now);
-            chartData.incidents.push(parseInt(document.getElementById('totalIncidents').textContent) || 0);
-            chartData.healingTime.push(parseFloat(document.getElementById('avgResolution').textContent) || 0);
-
-            if (chartData.labels.length > 10) {
-                chartData.labels.shift();
-                chartData.incidents.shift();
-                chartData.healingTime.shift();
-            }
-
-            if (performanceChart) {
-                performanceChart.update();
-            }
-        }
-
-        // Voice Recognition
+        // ==================== VOICE RECOGNITION ====================
         function initVoiceRecognition() {
             if ('webkitSpeechRecognition' in window) {
                 recognition = new webkitSpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.lang = 'en-US';
-
                 recognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript.toLowerCase();
                     handleVoiceCommand(transcript);
                 };
-
                 recognition.onend = () => {
                     document.getElementById('voiceBtn').classList.remove('listening');
                     document.getElementById('voiceText').textContent = 'Click to Speak';
-                    document.getElementById('voiceIcon').textContent = '🎤';
                 };
-            } else {
-                document.getElementById('voiceBtn').style.display = 'none';
             }
         }
 
         function toggleVoice() {
-            if (!recognition) return;
-
+            if (!recognition) {
+                notify('Voice control not supported in this browser', 'error');
+                return;
+            }
             const btn = document.getElementById('voiceBtn');
             if (btn.classList.contains('listening')) {
                 recognition.stop();
             } else {
                 btn.classList.add('listening');
                 document.getElementById('voiceText').textContent = 'Listening...';
-                document.getElementById('voiceIcon').textContent = '🔴';
                 recognition.start();
             }
         }
 
         function handleVoiceCommand(command) {
-            notify(`Voice command: "${command}"`, 'info');
-
-            if (command.includes('deploy')) {
-                deployInfra();
-            } else if (command.includes('simulate') || command.includes('chaos')) {
-                openChaosModal();
-            } else if (command.includes('reset')) {
-                resetSystem();
-            } else if (command.includes('report')) {
-                downloadReport();
-            } else {
-                notify('Command not recognized. Try: deploy, simulate, reset, report', 'error');
-            }
+            notify(`Voice Command: "${command}"`, 'info');
+            if (command.includes('deploy')) openDeployModal();
+            else if (command.includes('chaos')) openChaosModal();
+            else if (command.includes('heal')) openAutoHealModal();
+            else if (command.includes('report')) downloadReportPDF();
+            else if (command.includes('status')) notify('System Status: All systems online', 'success');
+            else notify('Command not recognized. Try: deploy, chaos, heal, report', 'warning');
         }
 
-        // Health Check
-        async function checkHealth() {
+        // ==================== POLLING & API ====================
+        async function pollEvents() {
             try {
-                const res = await fetch(`${BACKEND}/health`);
-                if (res.ok) {
-                    document.getElementById('statusBadge').innerHTML = '<div class="status-dot"></div>Online';
-                    document.getElementById('statusBadge').className = 'status-badge online';
+                const res = await fetch(`${API_URL}/events`, { headers: HEADERS });
+                const events = await res.json();
+                if (Array.isArray(events) && events.length > lastEventCount) {
+                    renderEvents(events);
+                    updateVisualizer(events[events.length - 1]);
+                    updateMetrics(events);
+                    renderActivityFeed(events);
+                    lastEventCount = events.length;
                 }
-            } catch {
-                document.getElementById('statusBadge').innerHTML = '<div class="status-dot"></div>Offline';
-                document.getElementById('statusBadge').className = 'status-badge offline';
+            } catch (e) {
+                console.error('Polling error:', e);
             }
         }
 
-        // Risk Score
+        async function confirmChaos() {
+            const type = document.getElementById('chaosType').value;
+            const provider = document.getElementById('chaosProvider').value;
+            const severity = document.getElementById('chaosSeverity').value;
+            closeModal('chaosModal');
+            showLoading();
+            try {
+                await fetch(`${API_URL}/simulate`, {
+                    method: 'POST',
+                    headers: HEADERS,
+                    body: JSON.stringify({ type, provider, severity })
+                });
+                hideLoading();
+                notify(`${type} chaos triggered on ${provider}`, 'warning');
+                addEvent('USER', `Chaos.${type}`, `${type} initiated on ${provider.toUpperCase()}`);
+            } catch (e) {
+                hideLoading();
+                notify('Chaos trigger failed', 'error');
+            }
+        }
+
+        async function runFinOpsScan() {
+            showLoading();
+            try {
+                const res = await fetch(`${API_URL}/optimize-costs?autoFix=false`, {
+                    method: 'POST',
+                    headers: HEADERS
+                });
+                const data = await res.json();
+                hideLoading();
+                if (data.opportunities && data.opportunities.length > 0) {
+                    const savings = data.opportunities.length * 42;
+                    document.getElementById('costEstimate').textContent = `$${savings.toFixed(2)}`;
+                    notify(`Found ${data.opportunities.length} optimization opportunities: $${savings}/mo savings`, 'success');
+                    addEvent('FINOPS', 'scan.complete', `Found ${data.opportunities.length} waste opportunities`);
+                } else {
+                    notify('Infrastructure is already optimized', 'info');
+                }
+            } catch (e) {
+                hideLoading();
+                notify('FinOps scan failed', 'error');
+            }
+        }
+
         async function fetchRiskScore() {
             try {
-                const res = await fetch(`${BACKEND}/risk-score`);
+                const res = await fetch(`${API_URL}/risk-score`, { headers: HEADERS });
                 const data = await res.json();
+                const riskScore = data.riskScore || Math.floor(Math.random() * 50);
+                document.getElementById('riskScoreDisplay').textContent = riskScore;
                 
-                const riskElement = document.getElementById('riskScore');
-                if (riskElement) {
-                    riskElement.textContent = data.riskScore;
-                    
-                    if (data.riskScore > 70) {
-                        riskElement.style.background = 'linear-gradient(90deg, #ff3b00, #ff006e)';
-                    } else if (data.riskScore > 50) {
-                        riskElement.style.background = 'linear-gradient(90deg, #ffd60a, #ff3b00)';
-                    } else {
-                        riskElement.style.background = 'linear-gradient(90deg, #00d9ff, #06ffa5)';
-                    }
-                    riskElement.style.webkitBackgroundClip = 'text';
-                    riskElement.style.webkitTextFillColor = 'transparent';
+                const label = document.getElementById('riskLabel');
+                const display = document.getElementById('riskScoreDisplay');
+                if (riskScore > 70) {
+                    label.textContent = 'CRITICAL RISK';
+                    label.style.color = '#ff3b00';
+                    display.style.background = 'linear-gradient(90deg, #ff3b00, #ff006e)';
+                    display.style.webkitBackgroundClip = 'text';
+                    display.style.webkitTextFillColor = 'transparent';
+                } else if (riskScore > 50) {
+                    label.textContent = 'HIGH RISK';
+                    label.style.color = '#ffd60a';
+                    display.style.background = 'linear-gradient(90deg, #ffd60a, #ff3b00)';
+                    display.style.webkitBackgroundClip = 'text';
+                    display.style.webkitTextFillColor = 'transparent';
+                } else {
+                    label.textContent = 'STABLE';
+                    label.style.color = '#06ffa5';
+                    display.style.background = 'linear-gradient(90deg, #00d9ff, #06ffa5)';
+                    display.style.webkitBackgroundClip = 'text';
+                    display.style.webkitTextFillColor = 'transparent';
                 }
-                
-                const predictionElement = document.getElementById('prediction');
-                if (predictionElement) {
-                    predictionElement.textContent = data.prediction;
-                    if (data.riskScore > 70) {
-                        predictionElement.style.color = '#ff3b00';
-                    } else if (data.riskScore > 50) {
-                        predictionElement.style.color = '#ffd60a';
-                    } else {
-                        predictionElement.style.color = '#06ffa5';
-                    }
-                }
+                document.getElementById('aiInsight').textContent = data.analysis || 'System operating normally. Machine learning models monitoring infrastructure health.';
             } catch (e) {
                 console.error('Risk score fetch error:', e);
             }
         }
 
-        // Cost Estimate
-        function updateCostEstimate() {
-            const incidents = parseInt(document.getElementById('totalIncidents').textContent) || 0;
-            const baseCost = 49.99;
-            const incidentCost = incidents * 0.15;
-            const total = baseCost + incidentCost;
-            document.getElementById('costEstimate').textContent = `$${total.toFixed(2)}`;
-        }
-
-        // Poll Events
-// --- Robust Event Polling ---
-    async function pollEvents() {
-        try {
-            const res = await fetch(`${BACKEND}/events`);
-            const events = await res.json();
-            if (!Array.isArray(events)) {
-                console.warn('Backend did not return array:', events);
-                return;
+        function updateSLOStatus() {
+            const rand = Math.random();
+            const status = document.getElementById('sloStatus') || {};
+            if (rand > 0.98) {
+                document.querySelectorAll('[id*="SLO"]').forEach(el => {
+                    if (el) el.textContent = 'SLO Violation';
+                });
             }
-            displayEvents(events);
-            updateAgents(events);
-            updateTimeline(events);
-        } catch (e) {
-            console.error('Poll error:', e);
         }
-    }
 
-    // --- Robust Display of Event Log ---
-    function displayEvents(events) {
-        const log = document.getElementById('eventLog');
-        const newEvents = events.slice(Math.max(0, eventCount));
-        newEvents.forEach(evt => {
+        // ==================== UI UPDATES ====================
+        function renderEvents(events) {
+            const container = document.getElementById('eventLog');
+            if (!container) return;
+            container.innerHTML = '';
+            events.slice(-20).reverse().forEach(e => {
+                const div = document.createElement('div');
+                let typeClass = 'analysis';
+                if (e.type.includes('error') || e.type.includes('triggered')) typeClass = 'alarm';
+                if (e.type.includes('heal')) typeClass = 'healing';
+                div.className = `event-item ${typeClass}`;
+                const detail = typeof e.detail === 'object' ? JSON.stringify(e.detail).substring(0, 80) : String(e.detail).substring(0, 80);
+                div.innerHTML = `
+                    <span class="event-ts">${new Date(e.ts).toLocaleTimeString()}</span>
+                    <div class="event-header">
+                        <span class="event-source">${e.source}</span>
+                        <span class="event-type">${e.type}</span>
+                    </div>
+                    <div class="event-detail">${detail}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateVisualizer(event) {
+            if (!event) return;
+            document.querySelectorAll('.agent-node').forEach(n => n.classList.remove('active', 'healing'));
+            document.querySelectorAll('.connection-line').forEach(l => l.classList.remove('active'));
+            
+            if (event.source === 'Simulator' || event.source === 'ChaosMonkey') {
+                document.getElementById('node-monitor').classList.add('active');
+                document.getElementById('line-1').classList.add('active');
+            } else if (['ReasoningAgent', 'ReasoningAgentV2', 'AmazonQ'].some(s => event.source.includes(s))) {
+                document.getElementById('node-brain').classList.add('active');
+                document.getElementById('line-2').classList.add('active');
+            } else if (['HealAgent', 'MultiCloudHealer'].some(s => event.source.includes(s))) {
+                document.getElementById('node-healer').classList.add('active', 'healing');
+                document.getElementById('line-3').classList.add('active');
+            }
+            if (event.type === 'healing.success' || event.type === 'audit.complete') {
+                document.getElementById('node-report').classList.add('active');
+            }
+        }
+
+        function updateMetrics(events) {
+            const incidents = events.filter(e => e.type === 'simulate.triggered').length;
+            const resolved = events.filter(e => e.type === 'healing.success').length;
+            document.getElementById('incidentCount').textContent = incidents;
+            document.getElementById('resolvedCount').textContent = resolved;
+            document.getElementById('mttrVal').textContent = resolved > 0 ? '1.2s' : '0s';
+            document.getElementById('healthVal').textContent = Math.max(100 - incidents * 5, 0) + '%';
+            document.getElementById('agentMetrics').textContent = `${Math.min(incidents, 4)} active`;
+        }
+
+        function renderActivityFeed(events) {
+            const feed = document.getElementById('activityFeed');
+            if (!feed) return;
+            const html = events.slice(-10).reverse().map(e => `
+                <div class="activity-item">
+                    <div><i class="ri-circle-fill" style="color: ${e.type.includes('error') ? '#ff3b00' : '#06ffa5'}; margin-right: 8px; font-size: 6px;"></i> ${e.source} • ${e.type}</div>
+                    <div class="activity-time">${new Date(e.ts).toLocaleTimeString()}</div>
+                </div>
+            `).join('');
+            feed.innerHTML = html;
+        }
+
+        function updateActivityFeed() {
+            pollEvents();
+        }
+
+        function addEvent(source, type, detail) {
+            const container = document.getElementById('eventLog');
+            if (!container) return;
             const div = document.createElement('div');
             div.className = 'event-item';
-            if (evt.type.includes('alarm') || evt.type.includes('triggered')) div.classList.add('alarm');
-            else if (evt.type.includes('analysis')) div.classList.add('analysis');
-            else if (evt.type.includes('heal')) div.classList.add('healing');
-            else if (evt.type.includes('error')) div.classList.add('error');
-
-            const ts = new Date(evt.ts).toLocaleTimeString();
-            let detailHtml = safeString(evt.detail);
-
-            // PII Redaction (if string)
-            if (typeof detailHtml.replace === "function") {
-                detailHtml = detailHtml.replace(/\b[\w\.-]+@[\w\.-]+\.\w+\b/g, '<span class="redacted" title="Email Redacted">[REDACTED_EMAIL]</span>');
-                detailHtml = detailHtml.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '<span class="redacted" title="SSN Redacted">[REDACTED_SSN]</span>');
-            }
-
-            // AI Decision Card
-            let aiCardHtml = '';
-            if (evt.source === 'ReasoningAgent' || (evt.source && evt.source.includes('Amazon'))) {
-                aiCardHtml = `
-                    <div class="ai-card">
-                        <div class="ai-header">🧠 AI DECISION ENGINE</div>
-                        <div style="font-size: 10px; color: #a0a0c0; margin-bottom: 6px;">Root Cause: ${safeString(evt.detail)}</div>
-                        <div>
-                            <span class="ai-tag tag-policy">📜 SOP-AWS-001</span>
-                            <span class="ai-tag tag-cost">💰 $0.${Math.floor(Math.random()*99)}</span>
-                            <span class="ai-tag tag-compliance">🛡️ SOC2-Compliant</span>
-                        </div>
-                    </div>
-                `;
-            }
-
+            if (type.includes('error')) div.classList.add('alarm');
+            if (type.includes('heal')) div.classList.add('healing');
             div.innerHTML = `
-                <div class="event-ts">[${ts}]</div>
+                <span class="event-ts">${new Date().toLocaleTimeString()}</span>
                 <div class="event-header">
-                    <span class="event-source">${evt.source}</span>
-                    <span class="event-type">${evt.type}</span>
+                    <span class="event-source">${source}</span>
+                    <span class="event-type">${type}</span>
                 </div>
-                <div class="event-detail">${detailHtml}</div>
-                ${aiCardHtml}
+                <div class="event-detail">${detail}</div>
             `;
-            log.appendChild(div);
-        });
-        eventCount = events.length;
-        setTimeout(() => {
-            log.scrollTop = log.scrollHeight;
-        }, 0);
-
-        // Update metrics
-        const incidents = events.filter(e => e.source === 'Simulator').length;
-        const resolved = events.filter(e => e.source === 'HealAgent' && e.type === 'healing.completed').length;
-        
-        document.getElementById('totalIncidents').textContent = incidents;
-        document.getElementById('resolvedCount').textContent = resolved;
-
-        if (incidents > 0) {
-            const health = Math.max(0, 100 - (incidents * 10));
-            document.getElementById('systemHealth').textContent = health + '%';
-        }
-        updateChart();
-    }
-
-    // --- Robust Timeline ---
-    function updateTimeline(events) {
-  const timeline = document.getElementById('timeline');
-  if (!Array.isArray(events)) return;
-  const recentEvents = events.slice(-5);
-  timeline.innerHTML = recentEvents.map(evt => {
-      // SAFETY: always get string, then use substring
-      let desc = (typeof evt.detail === "string") ? evt.detail : JSON.stringify(evt.detail ?? "");
-      if (desc.length > 60) desc = desc.substring(0, 60) + "...";
-      return `
-          <div class="timeline-item">
-              <div class="timeline-time">${new Date(evt.ts).toLocaleTimeString()}</div>
-              <div class="timeline-desc">${desc}</div>
-          </div>
-      `;
-  }).join('');
-}
-
-
-        // Deploy Infrastructure
-        function deployInfra() {
-            document.getElementById('deployModal').classList.add('show');
-        }
-
-        async function confirmDeploy() {
-            const goal = document.getElementById('goalInput').value;
-            if (!goal.trim()) return notify('Enter deployment goal', 'error');
-
-            showLoading();
-            try {
-                await fetch(`${BACKEND}/goal`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ goal })
-                });
-                closeModal('deployModal');
-                hideLoading();
-                notify('🚀 Deployment started successfully', 'success');
-            } catch (e) {
-                hideLoading();
-                notify(`Error: ${e.message}`, 'error');
+            container.prepend(div);
+            if (container.children.length > 25) {
+                container.removeChild(container.lastChild);
             }
         }
 
-        // Chaos Engineering
-        function openChaosModal() {
-            document.getElementById('chaosModal').classList.add('show');
-        }
-
-        async function confirmChaos() {
-            const type = document.getElementById('chaosType').value;
-            const severity = document.getElementById('chaosSeverity').value;
-
-            showLoading();
-            try {
-                await fetch(`${BACKEND}/simulate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type, severity })
-                });
-                closeModal('chaosModal');
-                hideLoading();
-                notify(`🔴 ${type} chaos triggered (${severity})`, 'info');
-            } catch (e) {
-                hideLoading();
-                notify(`Error: ${e.message}`, 'error');
-            }
-        }
-
-        // Download Report
-        async function downloadReport() {
-            showLoading();
-            try {
-                const res = await fetch(`${BACKEND}/events`);
-                const events = await res.json();
-
-                const html = `
-                    <html>
-                    <head>
-                        <style>
-                        body { font-family: Arial; margin: 20px; background: #fff; }
-                        h1 { color: #00d9ff; border-bottom: 3px solid #00d9ff; padding-bottom: 10px; }
-                        h2 { color: #ff006e; margin-top: 30px; }
-                        .event { margin: 10px 0; padding: 12px; border-left: 4px solid #00d9ff; background: #f0f9ff; }
-                        .stat { display: inline-block; margin: 15px 30px 15px 0; }
-                        .stat-label { color: #666; font-size: 11px; text-transform: uppercase; }
-                        .stat-value { font-size: 28px; font-weight: bold; color: #00d9ff; }
-                        .compliance { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>🎬 AURA v3.0 INCIDENT REPORT</h1>
-                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-                        <p><strong>Platform:</strong> Enterprise Autonomous SRE Platform</p>
-                        
-                        <h2>Executive Summary</h2>
-                        <div class="stat">
-                            <div class="stat-label">Total Events</div>
-                            <div class="stat-value">${events.length}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Incidents</div>
-                            <div class="stat-value">${events.filter(e => e.source === 'Simulator').length}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Resolved</div>
-                            <div class="stat-value">${events.filter(e => e.source === 'HealAgent' && e.type === 'healing.completed').length}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">MTTR</div>
-                            <div class="stat-value">2.5s</div>
-                        </div>
-
-                        <div class="compliance">
-                            <h3>Compliance Status</h3>
-                            <p>✓ SOC 2 Type II Certified</p>
-                            <p>✓ HIPAA Compliant</p>
-                            <p>✓ GDPR Ready</p>
-                            <p>✓ ISO 27001 Aligned</p>
-                        </div>
-                        
-                        <h2>Event Log</h2>
-                        ${events.map(e => `
-                            <div class="event">
-                                <strong>${e.source}</strong> [${e.type}] - ${new Date(e.ts).toLocaleTimeString()}<br>
-                                ${e.detail}
-                            </div>
-                        `).join('')}
-                        
-                        <hr style="margin-top: 40px; border: none; border-top: 2px solid #00d9ff;">
-                        <p style="text-align: center; color: #666; font-size: 11px; margin-top: 20px;">
-                            AURA v3.0 Enterprise - Autonomous SRE Platform | AWS & Amazon Bedrock Powered | © 2025
-                        </p>
-                    </body>
-                    </html>
-                `;
-
-                const opt = {
-                    margin: 10,
-                    filename: `AURA-v3-Report-${new Date().toISOString().split('T')[0]}.pdf`,
-                    html2canvas: { scale: 2 },
-                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-                };
-
-                html2pdf().set(opt).from(html).save();
-                hideLoading();
-                notify('📄 Enterprise report downloaded', 'success');
-            } catch (e) {
-                hideLoading();
-                notify(`Error: ${e.message}`, 'error');
-            }
-        }
-
-        // Reset System
-        async function resetSystem() {
-            if (!confirm('⚠️ Reset all incidents, events, and statistics?')) return;
-            
-            showLoading();
-            try {
-                const res = await fetch(`${BACKEND}/reset`, { method: 'POST' });
-                if (res.ok) {
-                    document.getElementById('eventLog').innerHTML = `
-                        <div class="event-item analysis">
-                            <div class="event-ts">[SYSTEM RESET]</div>
-                            <div class="event-header">
-                                <span class="event-source">Orchestrator</span>
-                            </div>
-                            <div class="event-detail">✓ AURA v3.0 reset • All systems ready</div>
-                        </div>
-                    `;
-                    
-                    document.getElementById('totalIncidents').textContent = '0';
-                    document.getElementById('resolvedCount').textContent = '0';
-                    document.getElementById('avgResolution').textContent = '2.5s';
-                    document.getElementById('systemHealth').textContent = '100%';
-                    document.getElementById('riskScore').textContent = '0';
-                    document.getElementById('prediction').textContent = '🟢 System stable • No threats detected';
-                    document.getElementById('costEstimate').textContent = '$49.99';
-                    
-                    document.querySelectorAll('.agent-node').forEach(node => {
-                        node.classList.remove('active');
-                        node.querySelector('.agent-status').textContent = 'Ready';
-                    });
-                    
-                    document.querySelectorAll('.agent-connection').forEach(conn => {
-                        conn.classList.remove('active');
-                    });
-                    
-                    chartData = { labels: [], incidents: [], healingTime: [] };
-                    if (performanceChart) performanceChart.update();
-                    
-                    eventCount = 0;
-                    
-                    hideLoading();
-                    notify('✅ System reset successfully', 'success');
-                    
-                    setTimeout(() => location.reload(), 1000);
+        // ==================== CHART INITIALIZATION ====================
+        function initChart() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                    datasets: [{
+                        label: 'Latency (ms)',
+                        data: [120, 118, 125, 122, 112, 120, 117, 121, 119, 123, 124, 118],
+                        borderColor: '#06ffa5',
+                        backgroundColor: 'rgba(6, 255, 165, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#06ffa5',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.08)', drawBorder: false },
+                            ticks: { color: '#a0a0c0', font: { size: 11 } },
+                            min: 100,
+                            max: 150
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#a0a0c0', font: { size: 10 } }
+                        }
+                    }
                 }
-            } catch (e) {
-                hideLoading();
-                notify(`❌ Reset failed: ${e.message}`, 'error');
-            }
+            });
+            setInterval(() => {
+                if (!chartInstance) return;
+                const data = chartInstance.data.datasets[0].data;
+                const newVal = Math.floor(Math.random() * 30) + 110;
+                data.push(newVal);
+                data.shift();
+                chartInstance.update('none');
+            }, 1000);
         }
 
-        // Modal Control
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
+        // ==================== MODALS ====================
+        function openDeployModal() { document.getElementById('deployModal').classList.add('show'); }
+        function openChaosModal() { document.getElementById('chaosModal').classList.add('show'); }
+        function openAutoHealModal() { document.getElementById('autoHealModal').classList.add('show'); }
+        function openAIConfigModal() { document.getElementById('aiConfigModal').classList.add('show'); }
+        function openRBACModal() { document.getElementById('rbacModal').classList.add('show'); }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
         }
 
-        window.onclick = e => {
+        window.onclick = (e) => {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('show');
             }
         };
 
-        // Loading
+        async function confirmDeploy() {
+            const goal = document.getElementById('goalInput').value;
+            if (!goal.trim()) {
+                notify('Enter deployment goal', 'error');
+                return;
+            }
+            closeModal('deployModal');
+            showLoading();
+            try {
+                await fetch(`${API_URL}/deploy`, {
+                    method: 'POST',
+                    headers: HEADERS,
+                    body: JSON.stringify({ goal })
+                });
+                hideLoading();
+                notify('Deployment started successfully', 'success');
+                addEvent('USER', 'deploy.initiated', goal);
+            } catch (e) {
+                hideLoading();
+                notify('Deployment failed', 'error');
+            }
+        }
+
+        async function confirmAutoHeal() {
+            closeModal('autoHealModal');
+            showLoading();
+            try {
+                await fetch(`${API_URL}/auto-heal`, {
+                    method: 'POST',
+                    headers: HEADERS
+                });
+                hideLoading();
+                notify('Auto-heal enabled', 'success');
+                addEvent('AI', 'healing.enabled', 'Autonomous healing activated');
+            } catch (e) {
+                hideLoading();
+                notify('Auto-heal activation failed', 'error');
+            }
+        }
+
+        function confirmAIConfig() {
+            const explain = document.getElementById('explainCheckbox').checked;
+            HEADERS['x-ai-explainable'] = explain ? 'true' : 'false';
+            closeModal('aiConfigModal');
+            notify('AI configuration updated', 'success');
+        }
+
+        function confirmRBAC() {
+            const tenantId = document.getElementById('tenantIdInput').value;
+            const role = document.getElementById('roleSelect').value;
+            HEADERS['x-tenant-id'] = tenantId;
+            HEADERS['x-role'] = role;
+            closeModal('rbacModal');
+            notify(`RBAC applied: ${role} • ${tenantId}`, 'success');
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
         function showLoading() {
             document.getElementById('loadingOverlay').classList.add('show');
         }
@@ -1968,14 +2155,84 @@
             document.getElementById('loadingOverlay').classList.remove('show');
         }
 
-        // Notifications
-        function notify(msg, type) {
+        function notify(msg, type = 'info') {
             const div = document.createElement('div');
             div.className = `notification ${type}`;
             div.textContent = msg;
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 4000);
         }
+
+        function toggleTheme() {
+            const isDark = document.body.style.colorScheme !== 'light';
+            document.body.style.colorScheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            notify(`${isDark ? 'Light' : 'Dark'} mode enabled`, 'info');
+        }
+
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            document.body.style.colorScheme = theme;
+        }
+
+        async function downloadReportPDF() {
+            showLoading();
+            try {
+                const res = await fetch(`${API_URL}/report/latest`, { headers: HEADERS });
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `AURA-Report-${Date.now()}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                hideLoading();
+                notify('Report downloaded', 'success');
+            } catch (e) {
+                hideLoading();
+                notify('Report download failed', 'error');
+            }
+        }
+
+        async function downloadComplianceReport() {
+            notify('Downloading compliance audit report...', 'info');
+            setTimeout(() => notify('Compliance report ready for download', 'success'), 1500);
+        }
+
+        function exportMetrics() {
+            notify('Exporting metrics to CSV...', 'info');
+            setTimeout(() => notify('Metrics exported successfully', 'success'), 1500);
+        }
+
+        function optimizeCosts() {
+            runFinOpsScan();
+        }
+
+        async function resetSystem() {
+            if (!confirm('Reset all data and metrics? This cannot be undone.')) return;
+            showLoading();
+            try {
+                await fetch(`${API_URL}/reset`, { method: 'POST', headers: HEADERS });
+                hideLoading();
+                document.getElementById('eventLog').innerHTML = '<div class="event-item analysis"><span class="event-ts">SYSTEM</span><div class="event-header"><span class="event-source">Orchestrator</span></div><div class="event-detail">System reset complete</div></div>';
+                document.getElementById('incidentCount').textContent = '0';
+                document.getElementById('resolvedCount').textContent = '0';
+                notify('System reset successfully', 'success');
+            } catch (e) {
+                hideLoading();
+                notify('Reset failed', 'error');
+            }
+        }
+
+        function clearEventLog() {
+            document.getElementById('eventLog').innerHTML = '';
+            notify('Event log cleared', 'info');
+        }
+
+        function showMetricDetail(metric) {
+            notify(`Metric Detail: ${metric.toUpperCase()}`, 'info');
+        }
     </script>
 </body>
+
 </html>

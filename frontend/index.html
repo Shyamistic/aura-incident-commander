@@ -1447,7 +1447,7 @@
             initChart();
             checkHealth();
             pollEvents();
-            setInterval(pollEvents, 500);
+            setInterval(pollEvents, 2000);
             setInterval(checkHealth, 5000);
             setInterval(fetchRiskScore, 2000);
             setInterval(updateCostEstimate, 3000);
@@ -1641,17 +1641,23 @@
         }
 
         // Poll Events
-        async function pollEvents() {
-            try {
-                const res = await fetch(`${BACKEND}/events`);
-                const events = await res.json();
-                displayEvents(events);
-                updateAgents(events);
-                updateTimeline(events);
-            } catch (e) {
-                console.error('Poll error:', e);
-            }
-        }
+       async function pollEvents() {
+       try {
+    const res = await fetch(`${BACKEND}/events`);
+    const events = await res.json();
+    // Defensive: Only process if we got an array
+    if (!Array.isArray(events)) {
+      // Optionally, log error message from backend
+      console.warn('Backend did not return array:', events);
+      return;
+    }
+    displayEvents(events);
+    updateAgents(events);
+    updateTimeline(events);
+  } catch (e) {
+    console.error('Poll error:', e);
+  }
+}
 
         // Display Events
         function displayEvents(events) {
@@ -1668,7 +1674,8 @@
                 else if (evt.type.includes('error')) div.classList.add('error');
 
                 const ts = new Date(evt.ts).toLocaleTimeString();
-                let detailHtml = evt.detail;
+                let detailHtml = typeof evt.detail === "string" ? evt.detail : JSON.stringify(evt.detail || "");
+                
 
                 // PII Redaction
                 detailHtml = detailHtml.replace(/\b[\w\.-]+@[\w\.-]+\.\w+\b/g, '<span class="redacted" title="Email Redacted">[REDACTED_EMAIL]</span>');

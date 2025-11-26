@@ -49,8 +49,8 @@ app.use(cors({
 
 // 1.1 DDOS Protection (Rate Limiting)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 1 * 60 * 1000,   // 1 minute window
+  max: 300,                  // Allow 300 requests per minute per IP (dev: ok for polling)
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Throttling engaged for system stability." }

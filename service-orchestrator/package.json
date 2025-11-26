@@ -3,15 +3,9 @@
   "version": "3.0.0",
   "description": "AURA - Enterprise Autonomous SRE Platform",
   "main": "src/index.js",
-  "engines": {
-    "node": "20.x"
-  },
-  "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
-  },
+  "engines": { "node": "20.x" },
+  "scripts": { "start": "node src/index.js" },
   "dependencies": {
-    "@aws-sdk/client-bedrock-agent-runtime": "^3.500.0",
     "@aws-sdk/client-bedrock-runtime": "^3.500.0",
     "@aws-sdk/client-lambda": "^3.500.0",
     "@aws-sdk/client-sns": "^3.500.0",
@@ -20,7 +14,7 @@
     "@langchain/langgraph": "^0.0.10",
     "@langchain/core": "^0.1.5",
     "@langchain/aws": "^0.0.1",
-    "@langchain/openai": "^0.0.14", 
+    "@langchain/openai": "^0.0.14",
     "@opentelemetry/api": "^1.8.0",
     "@opentelemetry/sdk-node": "^0.51.0",
     "@opentelemetry/auto-instrumentations-node": "^0.45.0",
@@ -40,8 +34,5 @@
     "prom-client": "^15.1.0",
     "zod": "^3.22.4",
     "winston": "^3.13.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
   }
 }

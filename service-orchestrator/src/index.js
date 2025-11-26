@@ -20,25 +20,32 @@ const PORT = process.env.PORT || 10000;
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (curl, Postman, Render health checks, mobile apps)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('[CORS] ✅ Allowing no-origin request (health check / curl / mobile)');
+      return callback(null, true);
+    }
     
     // Allow localhost variants
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      console.log(`[CORS] ✅ Allowing localhost: ${origin}`);
       return callback(null, true);
     }
     
     // Allow Vercel deployments
     if (origin.endsWith('.vercel.app')) {
+      console.log(`[CORS] ✅ Allowing Vercel: ${origin}`);
       return callback(null, true);
     }
     
     // Allow Render deployments
     if (origin.endsWith('.onrender.com')) {
+      console.log(`[CORS] ✅ Allowing Render: ${origin}`);
       return callback(null, true);
     }
     
     // Allow file:// protocol (for Electron, local builds)
     if (origin === 'file://') {
+      console.log('[CORS] ✅ Allowing file:// protocol');
       return callback(null, true);
     }
     
@@ -53,17 +60,18 @@ const corsOptions = {
     ];
     
     if (whitelistedDomains.includes(origin)) {
+      console.log(`[CORS] ✅ Allowing whitelisted: ${origin}`);
       return callback(null, true);
     }
     
     // Log rejected origins for debugging
-    console.warn(`[CORS] Rejected origin: ${origin}`);
+    console.warn(`[CORS] ⚠️  Origin not explicitly whitelisted: ${origin}`);
     
-    // For development: allow anyway but log
-    // For production: uncomment below to enforce whitelist
+    // For development/MVP: allow anyway but log (safe for MVP demos)
+    // For production: uncomment line below to enforce strict whitelist
     // return callback(new Error('CORS policy: Origin not allowed by AURA backend'));
     
-    return callback(null, true); // Allow for now (safe for MVP)
+    return callback(null, true);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
   credentials: true,
@@ -110,13 +118,21 @@ app.get('/version', (req, res) => {
   });
 });
 
-// ===== Enterprise API Rate-Limiting (AFTER health endpoints) =====
+// ===== Enterprise API Rate-Limiting with IPv6 Support (AFTER health endpoints) =====
+// FIX: Use ipKeyGenerator helper for IPv6 support
+const { ipKeyGenerator } = require('express-rate-limit');
+
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 600, // 600 requests per minute
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.headers['x-tenant-id'] || req.ip || 'unknown',
+  keyGenerator: (req) => {
+    // Use ipKeyGenerator for IPv6 support (required by express-rate-limit v7+)
+    const key = ipKeyGenerator(req);
+    // Fall back to tenant ID if available
+    return req.headers['x-tenant-id'] || key;
+  },
   handler: (req, res) => {
     res.status(429).json({ 
       error: 'Too many requests. Throttling engaged for system stability.',

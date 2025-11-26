@@ -1,6 +1,5 @@
 // service-orchestrator/src/index.js
 // AURA v3.0 - Enterprise Autonomous Incident Response Platform
-// ARCHITECTURE: Event-Driven | Multi-Agent | Self-Healing
 
 require('dotenv').config();
 const express = require('express');
@@ -8,8 +7,8 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { SNSClient, SubscribeCommand, ConfirmSubscriptionCommand } = require('@aws-sdk/client-sns');
-const rateLimit = require('express-rate-limit'); // NEW: DDOS Protection
-const client = require('prom-client'); // NEW: Prometheus Metrics
+const rateLimit = require('express-rate-limit'); // DDOS Protection
+const client = require('prom-client'); // Prometheus Metrics
 
 // --- INTERNAL IMPORTS ---
 const HITLController = require('./middleware/hitlController');
@@ -18,13 +17,27 @@ const { redact } = require('./middleware/piiRedactor');
 
 // Initialize Express
 const app = express();
-
-// Define PORT immediately
 const PORT = process.env.PORT || 3000;
 
-// ==========================================
-// 🛡️ MODULE 1: ENTERPRISE SECURITY & GOVERNANCE
-// ==========================================
+// ---------- CORS FIX FOR VERCEL DEPLOY ----------
+const allowedOrigins = [
+  'https://aura-incident-commander.vercel.app',
+  'https://aura-incident-commander-j9mvd3dw4.vercel.app', // Preview deploys
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow no origin for curl/postman/internal requests
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: Not allowed by AURA backend'), false);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // 1.1 DDOS Protection (Rate Limiting)
 const limiter = rateLimit({
@@ -38,13 +51,11 @@ app.use(limiter);
 
 // 1.2 Multi-Tenant Isolation (Middleware simulation)
 app.use((req, res, next) => {
-  // In a real SaaS, this would verify JWT tokens
   req.tenantId = req.headers['x-tenant-id'] || 'default-corp';
   next();
 });
 
 // Middleware Config
-app.use(cors());
 app.use(express.json());
 app.use(express.text());
 
@@ -136,7 +147,6 @@ try {
 // ==========================================
 // 🌐 API ENDPOINTS
 // ==========================================
-
 // 1. Health & Metrics
 app.get('/health', (req, res) => res.json({ status: 'healthy', uptime: process.uptime() }));
 app.get('/metrics', async (req, res) => {
@@ -166,27 +176,25 @@ app.post('/goal', async (req, res) => {
   }
 });
 
-// 4. Chaos Simulation (The "Demo" Button)
+// 4. Chaos Simulation
 app.post('/simulate', async (req, res) => {
   try {
     const { type } = req.body;
     const attackType = type || 'LATENCY_SPIKE';
 
     pushEvent({ source: 'Simulator', type: 'simulate.triggered', detail: `Injecting ${attackType}` });
-    incidentCounter.inc({ severity: 'high', tenant: 'demo-corp' }); // Update Prometheus
+    incidentCounter.inc({ severity: 'high', tenant: 'demo-corp' });
 
-    // 1. Unleash Chaos
-    // Check if ChaosAgent exists, else fallback to manual simulation
+    // ChaosAgent
     try {
         const ChaosAgent = require('./handlers/chaosAgent');
         const chaos = new ChaosAgent({ pushEvent });
         await chaos.unleash(attackType);
     } catch (e) {
-        // Fallback if ChaosAgent file missing
         pushEvent({ source: 'ChaosMonkey', type: 'impact.detected', detail: 'Simulating 5000ms Latency Spike' });
     }
 
-    // 2. Create Realistic Alarm Payload
+    // Realistic Alarm Payload
     const simulatedAlarm = {
       AlarmName: 'HighErrorAlarm',
       NewState: 'ALARM',
@@ -195,18 +203,12 @@ app.post('/simulate', async (req, res) => {
     };
 
     const snsPayload = { Type: 'Notification', Message: JSON.stringify(simulatedAlarm) };
-
-    // 3. Trigger Autonomous Defense
     const { handleAlarm } = require('./handlers/monitorAgent');
     const start = Date.now();
     
     handleAlarm(snsPayload, { pushEvent, hitlController })
-      .then(() => {
-         healingDuration.observe((Date.now() - start) / 1000); // Record metric
-      })
-      .catch(err => {
-        pushEvent({ source: 'System', type: 'error', detail: String(err) });
-      });
+      .then(() => healingDuration.observe((Date.now() - start) / 1000))
+      .catch(err => pushEvent({ source: 'System', type: 'error', detail: String(err) }));
 
     res.json({ status: 'chaos_started' });
   } catch (err) {
@@ -219,20 +221,17 @@ app.post('/sns', async (req, res) => {
   try {
     let payload = req.body;
     if (typeof req.body === 'string') { try { payload = JSON.parse(req.body); } catch(e) {} }
-
     if (payload.Type === 'SubscriptionConfirmation') {
       const snsClient = new SNSClient({ region: process.env.AWS_REGION || 'us-east-1' });
       await snsClient.send(new ConfirmSubscriptionCommand({ Token: payload.Token, TopicArn: payload.TopicArn }));
       pushEvent({ source: 'SNS', type: 'subscription.confirmed', detail: payload.TopicArn });
       return res.status(200).send('Confirmed');
     }
-
     if (payload.Type === 'Notification') {
       const { handleAlarm } = require('./handlers/monitorAgent');
       handleAlarm(payload, { pushEvent, hitlController }); // Async
       return res.json({ status: 'processing' });
     }
-    
     res.status(200).json({ status: 'ignored' });
   } catch (err) {
     console.error(err);
@@ -258,11 +257,9 @@ app.get('/risk-score', (req, res) => {
   try {
     const errorCount = events.filter(e => e.type && e.type.includes('error')).length;
     const healedCount = events.filter(e => e.type === 'heal.completed').length;
-    
-    // Enterprise Risk Algorithm
     let riskScore = 0;
-    riskScore += (errorCount * 5); // Weight errors
-    riskScore -= (healedCount * 10); // Credit for healing
+    riskScore += (errorCount * 5);
+    riskScore -= (healedCount * 10);
     if (riskScore < 0) riskScore = 0;
     if (riskScore > 100) riskScore = 100;
 
@@ -322,7 +319,6 @@ app.get('/report-view', (req, res) => {
 async function subscribeToSnsTopic() {
   const serverPublicUrl = process.env.PUBLIC_URL; 
   if (!serverPublicUrl || !cdkConfig.snsTopicArn) return;
-  
   try {
     const snsClient = new SNSClient({ region: process.env.AWS_REGION || 'us-east-1' });
     await snsClient.send(new SubscribeCommand({
@@ -345,7 +341,6 @@ app.listen(PORT, '0.0.0.0', () => {
   ║   📊 METRICS:     /metrics (Prometheus)      ║
   ╚══════════════════════════════════════════════╝
   `);
-  
   pushEvent({ source: 'System', type: 'system.startup', detail: `AURA v3.0 initialized on port ${PORT}` });
   subscribeToSnsTopic();
 });

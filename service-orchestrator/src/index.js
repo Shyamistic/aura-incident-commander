@@ -1,5 +1,5 @@
 // 1. OBSERVABILITY FIRST (Must be the very first line)
-require('./src/instrumentation'); 
+require('./instrumentation');
 
 require('dotenv').config();
 const express = require('express');

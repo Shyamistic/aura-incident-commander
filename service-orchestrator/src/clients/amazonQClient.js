@@ -1,7 +1,8 @@
 // service-orchestrator/src/clients/amazonQClient.js
-// NEW FILE
+// ENTERPRISE VERSION: RAG-Enabled & FinOps Aware
 
 const { BedrockAgentRuntimeClient, InvokeAgentCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
+const KnowledgeBase = require('../services/knowledgeBase'); // RAG Integration
 
 class AmazonQClient {
   constructor() {
@@ -13,27 +14,41 @@ class AmazonQClient {
 
     if (!this.agentId || !this.agentAliasId) {
         console.error('[AmazonQClient] FATAL: AMAZON_Q_AGENT_ID or AMAZON_Q_AGENT_ALIAS_ID is not set in .env');
-        throw new Error('Amazon Q client is not configured.');
+        // We don't throw here to allow the app to start in "Mock" mode, 
+        // but calls to this client will fail gracefully via the fallback.
     }
   }
 
   /**
-   * Calls the Amazon Q Agent to analyze a raw CloudWatch alarm.
+   * Calls Amazon Q with RAG Context (SOPs) and FinOps constraints.
    */
   async analyzeIncident(alarmData) {
-    // This prompt is engineered to force JSON output and select from our playbook
-    const prompt = `You are an expert AWS SRE agent analyzing a production incident.
-ALARM DATA:
+    // 1. RAG RETRIEVAL: Get relevant corporate policies
+    const alarmName = alarmData.AlarmName || 'Unknown';
+    const corporatePolicy = KnowledgeBase.getContext(alarmName);
+
+    // 2. PROMPT ENGINEERING: Inject Context & Business Logic
+    const prompt = `
+You are an Enterprise Site Reliability Engineer (SRE) and FinOps Controller.
+
+CONTEXT & CORPORATE SOPs (STRICTLY FOLLOW THESE):
+${corporatePolicy}
+
+INCIDENT DATA:
 ${JSON.stringify(alarmData, null, 2)}
 
-Your task:
-1. Provide a "root_cause_analysis" (2-3 sentences).
-2. Recommend ONE "remediation_plan" from this exact list: [RESTART_LAMBDA, INCREASE_LAMBDA_TIMEOUT, INCREASE_LAMBDA_MEMORY, LOG_ONLY]
+YOUR TASK:
+1. Analyze the root cause based on the Alarm Data.
+2. Select ONE remediation plan from: [RESTART_LAMBDA, INCREASE_LAMBDA_TIMEOUT, INCREASE_LAMBDA_MEMORY, LOG_ONLY].
+3. YOU MUST CITE the specific SOP ID (e.g., "SOP-001") that authorizes this action.
+4. ESTIMATE the financial impact (e.g., "Increases compute cost by 2x").
 
-Respond ONLY with valid JSON in this exact format:
+OUTPUT JSON FORMAT ONLY:
 {
   "root_cause_analysis": "...",
-  "remediation_plan": "RESTART_LAMBDA"
+  "remediation_plan": "RESTART_LAMBDA",
+  "policy_citation": "SOP-001",
+  "financial_impact": "+$0.00 (Transient State Reset)"
 }`;
 
     try {
@@ -44,7 +59,7 @@ Respond ONLY with valid JSON in this exact format:
         inputText: prompt
       });
 
-      console.log('[AmazonQClient] Invoking Amazon Q Agent...');
+      console.log('[AmazonQClient] Invoking Agent with RAG Context...');
       const response = await this.client.send(command);
       
       let fullResponse = '';
@@ -54,52 +69,55 @@ Respond ONLY with valid JSON in this exact format:
         }
       }
       
-      console.log('[AmazonQClient] Received raw response:', fullResponse);
+      console.log('[AmazonQClient] Received Raw Response.');
       
-      // Clean the response (Bedrock often adds text before/after JSON)
+      // 3. PARSE & VALIDATE
+      // Bedrock sometimes wraps JSON in markdown or text, so we extract the JSON object
       const jsonMatch = fullResponse.match(/\{[\s\S]*\}/);
+      
       if (!jsonMatch) {
-          console.error('[AmazonQClient] Failed to parse JSON response from agent.');
+          console.error('[AmazonQClient] Failed to parse JSON from agent response.');
           return this.intelligentFallback(alarmData, "AI response was not valid JSON.");
       }
       
       const parsedResponse = JSON.parse(jsonMatch[0]);
-      parsedResponse.ai_provider = 'Amazon Q Developer';
+      parsedResponse.ai_provider = 'Amazon Q + RAG Knowledge';
       
-      console.log('[AmazonQClient] Parsed analysis:', parsedResponse);
       return parsedResponse;
 
     } catch (error) {
       console.error('[AmazonQClient] Error invoking agent:', error.message);
-      // If AI fails, use a rule-based fallback
       return this.intelligentFallback(alarmData, error.message);
     }
   }
 
   /**
-   * A rule-based fallback if the Amazon Q call fails.
-   * This ensures your app is still resilient.
+   * Fallback Rule Engine (if AI fails)
    */
   intelligentFallback(alarmData, errorMsg) {
     const alarmName = alarmData.AlarmName || '';
     let analysis = {
-        root_cause_analysis: `AI analysis failed (${errorMsg}). Using rule-based fallback.`,
+        root_cause_analysis: `AI Connectivity Error (${errorMsg}). Switched to deterministic fallback rules.`,
         remediation_plan: 'LOG_ONLY',
+        policy_citation: 'SOP-FALLBACK-99',
+        financial_impact: 'Unknown',
         ai_provider: 'Rule-Based Fallback'
     };
 
     if (alarmName.includes('Timeout') || alarmName.includes('Duration')) {
-      analysis.root_cause_analysis += ` Alarm name '${alarmName}' suggests a timeout.`;
+      analysis.root_cause_analysis += ` Pattern match: Timeout detected.`;
       analysis.remediation_plan = 'INCREASE_LAMBDA_TIMEOUT';
+      analysis.financial_impact = '+10% Compute Cost';
     } else if (alarmName.includes('Error') || alarmName.includes('Failure')) {
-      analysis.root_cause_analysis += ` Alarm name '${alarmName}' suggests a transient error.`;
+      analysis.root_cause_analysis += ` Pattern match: Transient Failure.`;
       analysis.remediation_plan = 'RESTART_LAMBDA';
+      analysis.financial_impact = 'Zero Cost';
     } else if (alarmName.includes('Memory')) {
-      analysis.root_cause_analysis += ` Alarm name '${alarmName}' suggests memory exhaustion.`;
+      analysis.root_cause_analysis += ` Pattern match: OOM Exception.`;
       analysis.remediation_plan = 'INCREASE_LAMBDA_MEMORY';
+      analysis.financial_impact = '+15% Compute Cost';
     }
     
-    console.warn('[AmazonQClient] Using fallback analysis:', analysis);
     return analysis;
   }
 }

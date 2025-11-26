@@ -1,47 +1,49 @@
 // service-orchestrator/src/orchestrator.js
-// FIXED: Passing String instead of Object
+// ENTERPRISE VERSION: Correct routing and data types
 
-const deployAgent = require('./handlers/deployAgent');
+const DeployAgent = require('./handlers/deployAgent');
+// Note: We use dynamic require for agents to ensure fresh state
 
 async function handleGoal(goalText, ctx = {}) {
-  const pushEvent = ctx.pushEvent || (() => {});
+  const pushEvent = ctx.pushEvent || console.log;
   
-  // Log the start
-  pushEvent({ source: 'Orchestrator', type: 'plan.start', detail: goalText });
+  // 1. Log Mission Start
+  pushEvent({ source: 'Orchestrator', type: 'plan.start', detail: `Orchestrating: ${goalText}` });
+
+  // 2. Initialize Context
+  // We pass the entire context (events, hitl, config) to the agent
+  const agentContext = { ...ctx };
 
   try {
-    // 1. Run Deploy Agent
-    // FIX: We pass 'goalText' (String) directly. 
-    // The previous version passed an object, which caused the .toLowerCase() crash.
-    let result;
-    
-    // Check if it's a module with a static run function or a Class
-    if (deployAgent.run) {
-        result = await deployAgent.run(goalText, ctx);
-    } else {
-        // Fallback if it's a Class structure
-        const agentInstance = new deployAgent(ctx);
-        result = await agentInstance.run(goalText);
+    // 3. EXECUTE DEPLOY AGENT
+    // FIX: Pass the goalText (String) explicitly
+    const deployer = new DeployAgent(agentContext);
+    const result = await deployer.run(goalText);
+
+    // 4. CHECK RESULT
+    if (!result || !result.success) {
+      throw new Error(result.error || 'Deployment failed verification.');
     }
 
-    // If deploy failed, we stop
-    if (!result || !result.success) {
-      const msg = result.error || 'Deploy failed';
-      pushEvent({ source: 'Orchestrator', type: 'plan.failed', detail: msg });
-      return { status: 'failed' };
-    }
-    
-    // 2. Activate Monitor Agent (Passive)
-    pushEvent({ source: 'MonitorAgent', type: 'monitor.started', detail: 'Now monitoring for alarms...' });
-    
-    pushEvent({ source: 'Orchestrator', type: 'plan.complete', detail: 'Infrastructure successfully provisioned.' });
-    return { status: 'ok' };
-    
+    // 5. ACTIVATE MONITORING (Passive)
+    pushEvent({ 
+      source: 'MonitorAgent', 
+      type: 'monitor.started', 
+      detail: 'Active Monitoring: ON. Watching CloudWatch Metrics.' 
+    });
+
+    pushEvent({ 
+      source: 'Orchestrator', 
+      type: 'plan.complete', 
+      detail: 'Mission Accomplished. Infrastructure is Live.' 
+    });
+
+    return { status: 'ok', result };
+
   } catch (err) {
-    console.error('Orchestrator Error:', err);
-    // Send a string detail to avoid [Object object] logs
+    console.error('[Orchestrator] Failed:', err);
     pushEvent({ source: 'Orchestrator', type: 'plan.failed', detail: String(err.message) });
-    return { status: 'failed' };
+    return { status: 'failed', error: err.message };
   }
 }
 

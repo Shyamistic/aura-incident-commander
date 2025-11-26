@@ -1200,18 +1200,6 @@
             }
         }
 
-        /* ==================== ADVANCED ANIMATIONS ==================== */
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .gradient-text {
-            background-size: 200% 200%;
-            animation: gradientShift 3s ease infinite;
-        }
-
         /* ==================== VOICE COMMAND ==================== */
         .voice-btn {
             width: 100%;
@@ -1843,6 +1831,30 @@
             }
         }
 
+        async function confirmDeploy() {
+            const goal = document.getElementById('goalInput').value;
+            if (!goal.trim()) {
+                notify('Enter deployment goal', 'error');
+                return;
+            }
+            closeModal('deployModal');
+            showLoading();
+            try {
+                const res = await fetch(`${API_URL}/goal`, {
+                    method: 'POST',
+                    headers: HEADERS,
+                    body: JSON.stringify({ goal })
+                });
+                const data = await res.json();
+                hideLoading();
+                notify('Deployment initiated successfully', 'success');
+                addEvent('USER', 'deploy.initiated', goal);
+            } catch (e) {
+                hideLoading();
+                notify('Deployment failed', 'error');
+            }
+        }
+
         async function confirmChaos() {
             const type = document.getElementById('chaosType').value;
             const provider = document.getElementById('chaosProvider').value;
@@ -1850,11 +1862,12 @@
             closeModal('chaosModal');
             showLoading();
             try {
-                await fetch(`${API_URL}/simulate`, {
+                const res = await fetch(`${API_URL}/simulate`, {
                     method: 'POST',
                     headers: HEADERS,
                     body: JSON.stringify({ type, provider, severity })
                 });
+                const data = await res.json();
                 hideLoading();
                 notify(`${type} chaos triggered on ${provider}`, 'warning');
                 addEvent('USER', `Chaos.${type}`, `${type} initiated on ${provider.toUpperCase()}`);
@@ -1923,7 +1936,6 @@
 
         function updateSLOStatus() {
             const rand = Math.random();
-            const status = document.getElementById('sloStatus') || {};
             if (rand > 0.98) {
                 document.querySelectorAll('[id*="SLO"]').forEach(el => {
                     if (el) el.textContent = 'SLO Violation';
@@ -2090,37 +2102,11 @@
             }
         };
 
-        async function confirmDeploy() {
-            const goal = document.getElementById('goalInput').value;
-            if (!goal.trim()) {
-                notify('Enter deployment goal', 'error');
-                return;
-            }
-            closeModal('deployModal');
-            showLoading();
-            try {
-                await fetch(`${API_URL}/deploy`, {
-                    method: 'POST',
-                    headers: HEADERS,
-                    body: JSON.stringify({ goal })
-                });
-                hideLoading();
-                notify('Deployment started successfully', 'success');
-                addEvent('USER', 'deploy.initiated', goal);
-            } catch (e) {
-                hideLoading();
-                notify('Deployment failed', 'error');
-            }
-        }
-
         async function confirmAutoHeal() {
             closeModal('autoHealModal');
             showLoading();
             try {
-                await fetch(`${API_URL}/auto-heal`, {
-                    method: 'POST',
-                    headers: HEADERS
-                });
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 hideLoading();
                 notify('Auto-heal enabled', 'success');
                 addEvent('AI', 'healing.enabled', 'Autonomous healing activated');
@@ -2178,14 +2164,19 @@
         async function downloadReportPDF() {
             showLoading();
             try {
-                const res = await fetch(`${API_URL}/report/latest`, { headers: HEADERS });
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `AURA-Report-${Date.now()}.pdf`;
-                a.click();
-                window.URL.revokeObjectURL(url);
+                const id = `INC-${Date.now()}`;
+                const res = await fetch(`${API_URL}/report/download/${id}`, { headers: HEADERS });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `AURA-Report-${Date.now()}.pdf`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    throw new Error('Report not found');
+                }
                 hideLoading();
                 notify('Report downloaded', 'success');
             } catch (e) {
@@ -2194,7 +2185,7 @@
             }
         }
 
-        async function downloadComplianceReport() {
+        function downloadComplianceReport() {
             notify('Downloading compliance audit report...', 'info');
             setTimeout(() => notify('Compliance report ready for download', 'success'), 1500);
         }

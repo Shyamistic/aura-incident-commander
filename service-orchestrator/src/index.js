@@ -15,13 +15,14 @@ const client = require('prom-client');
 const { ipKeyGenerator } = require('express-rate-limit');
 
 // ===== NEW ENTERPRISE MODULES =====
-const EnterpriseSecurity = require('./src/middleware/Enterprise_Security_Policy');
-const ReasoningAgentV2 = require('./src/agents/ReasoningAgent_v2_LangGraph');
-const MultiCloudHealer = require('./src/agents/MultiCloudHealer');
-const DashboardApi = require('./src/api/DashboardApi');
-const FinOpsAgent = require('./src/agents/FinOpsAgent');
-const pdfGenerator = require('./src/utils/pdfGenerator');
-
+// ✅ CORRECT (Relative Paths)
+const EnterpriseSecurity = require('./middleware/Enterprise_Security_Policy');
+const ReasoningAgentV2 = require('./agents/ReasoningAgent_v2_LangGraph');
+const MultiCloudHealer = require('./agents/MultiCloudHealer');
+const DashboardApi = require('./api/DashboardApi');
+// If you added FinOps/PDF logic, fix those too:
+const FinOpsAgent = require('./agents/FinOpsAgent');
+const pdfGenerator = require('./utils/pdfGenerator');
 // Legacy/Helper Imports
 const HITLController = require('./middleware/hitlController');
 const { handleGoal } = require('./orchestrator');
@@ -166,7 +167,7 @@ try {
 
 // ===== MOUNT NEW API ROUTES =====
 // Mounts the Dashboard API (SSE, Topology) protected by Security Policy
-app.use('/api/dashboard', require('./src/api/DashboardApi'));
+app.use('/api/dashboard', require('./api/DashboardApi'));
 
 // ===== CORE API ROUTES =====
 

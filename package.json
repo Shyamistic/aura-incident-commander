@@ -14,7 +14,15 @@
     "typescript": "4.9.5"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.940.0",
     "@aws-sdk/client-sns": "^3.932.0",
-    "helmet": "^8.1.0"
+    "@langchain/aws": "^1.0.3",
+    "@langchain/core": "^1.1.0",
+    "@langchain/langgraph": "^1.0.2",
+    "@opentelemetry/auto-instrumentations-node": "^0.67.1",
+    "@opentelemetry/sdk-node": "^0.208.0",
+    "helmet": "^8.1.0",
+    "winston": "^3.18.3",
+    "zod": "^4.1.13"
   }
 }

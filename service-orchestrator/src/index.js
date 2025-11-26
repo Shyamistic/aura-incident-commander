@@ -80,14 +80,15 @@ app.get('/health', (req, res) => {
 app.get('/ready', (req, res) => res.json({ ready: true }));
 
 // ===== RATE LIMITING (DDoS Protection) =====
+// REPLACE THE LIMITER BLOCK WITH THIS
 const limiter = rateLimit({
-  windowMs: 60 * 1000, 
+  windowMs: 60 * 1000, // 1 minute
   max: 600, 
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    // IPv6 support + Tenant Isolation
-    return req.headers['x-tenant-id'] || ipKeyGenerator(req);
+    // FIX: Use standard req.ip instead of the missing helper
+    return req.headers['x-tenant-id'] || req.ip;
   },
   handler: (req, res) => {
     res.status(429).json({ error: 'Throttling engaged. System stability protected.' });

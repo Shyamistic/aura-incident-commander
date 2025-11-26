@@ -1,7 +1,6 @@
 // service-orchestrator/src/orchestrator.js
-// CORRECTED PATHS
+// FIXED: Passing String instead of Object
 
-// Pointing to 'handlers' instead of 'agents'
 const deployAgent = require('./handlers/deployAgent');
 
 async function handleGoal(goalText, ctx = {}) {
@@ -10,46 +9,40 @@ async function handleGoal(goalText, ctx = {}) {
   // Log the start
   pushEvent({ source: 'Orchestrator', type: 'plan.start', detail: goalText });
 
-  // Define the mission
-  const tasks = [
-    { id: 'deploy', agent: 'DeployAgent', input: { app: 'sample-lambda' } },
-    { id: 'monitor', agent: 'MonitorAgent', input: { app: 'sample-lambda' } },
-  ];
-
-  const results = [];
-  
   try {
     // 1. Run Deploy Agent
-    // We assume the agent exports a 'run' function or is an object with 'run'
-    // Adjusting based on your deployAgent.js structure
+    // FIX: We pass 'goalText' (String) directly. 
+    // The previous version passed an object, which caused the .toLowerCase() crash.
     let result;
+    
+    // Check if it's a module with a static run function or a Class
     if (deployAgent.run) {
-        result = await deployAgent.run(tasks[0].input, { pushEvent });
+        result = await deployAgent.run(goalText, ctx);
     } else {
-        // Fallback if it's a class
+        // Fallback if it's a Class structure
         const agentInstance = new deployAgent(ctx);
-        result = await agentInstance.run(tasks[0].input);
+        result = await agentInstance.run(goalText);
     }
 
-    results.push(result);
-    
     // If deploy failed, we stop
     if (!result || !result.success) {
-      pushEvent({ source: 'Orchestrator', type: 'plan.failed', detail: 'Deploy failed, stopping mission.' });
-      return { status: 'failed', tasks: results };
+      const msg = result.error || 'Deploy failed';
+      pushEvent({ source: 'Orchestrator', type: 'plan.failed', detail: msg });
+      return { status: 'failed' };
     }
+    
+    // 2. Activate Monitor Agent (Passive)
+    pushEvent({ source: 'MonitorAgent', type: 'monitor.started', detail: 'Now monitoring for alarms...' });
+    
+    pushEvent({ source: 'Orchestrator', type: 'plan.complete', detail: 'Infrastructure successfully provisioned.' });
+    return { status: 'ok' };
     
   } catch (err) {
     console.error('Orchestrator Error:', err);
-    pushEvent({ source: 'Orchestrator', type: 'plan.failed', detail: String(err) });
-    return { status: 'failed', tasks: results };
+    // Send a string detail to avoid [Object object] logs
+    pushEvent({ source: 'Orchestrator', type: 'plan.failed', detail: String(err.message) });
+    return { status: 'failed' };
   }
-  
-  // 2. Activate Monitor Agent (Passive)
-  pushEvent({ source: 'MonitorAgent', type: 'monitor.started', detail: 'Now monitoring for alarms...' });
-  
-  pushEvent({ source: 'Orchestrator', type: 'plan.complete', detail: results });
-  return { status: 'ok', tasks: results };
 }
 
 module.exports = { handleGoal };

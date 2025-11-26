@@ -12,7 +12,6 @@ const path = require('path');
 // AWS SDK, Prometheus, and internal logic
 const { SNSClient, SubscribeCommand, ConfirmSubscriptionCommand } = require('@aws-sdk/client-sns');
 const client = require('prom-client');
-const { ipKeyGenerator } = require('express-rate-limit');
 
 // ===== NEW ENTERPRISE MODULES =====
 // ✅ CORRECT (Relative Paths)
@@ -83,17 +82,21 @@ app.get('/ready', (req, res) => res.json({ ready: true }));
 // REPLACE THE LIMITER BLOCK WITH THIS
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 600, 
+  max: 600, // 600 requests per minute
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    // FIX: Use standard req.ip instead of the missing helper
+    // FIX: Use standard req.ip directly
     return req.headers['x-tenant-id'] || req.ip;
   },
   handler: (req, res) => {
-    res.status(429).json({ error: 'Throttling engaged. System stability protected.' });
+    res.status(429).json({ 
+      error: 'Too many requests. Throttling engaged for system stability.',
+      retryAfter: req.rateLimit.resetTime
+    });
   }
 });
+
 app.use(limiter);
 
 // ===== INPUT PARSING & TRACING =====
